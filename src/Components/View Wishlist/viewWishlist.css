@@ -1,0 +1,14 @@
+.titleCol {
+  display: flex;
+  align-items: center;
+  /* : 15px, 0; */
+}
+
+.titleCol > span {
+  margin-right: 10px;
+  font-size: 19px;
+}
+
+.titleCol > button {
+  font-weight: bold;
+}

@@ -1,0 +1,13 @@
+thead > tr > th {
+  font-weight: bold !important;
+  font-size: 15px;
+}
+
+.bodyBG{
+  background-color: #eeeeee;
+}
+
+.cardStats{
+  box-shadow: 10px 10px 17px 0px rgba(18,104,129,0.41);
+  border-radius: 20px !important;
+};

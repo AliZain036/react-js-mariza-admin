@@ -1,0 +1,300 @@
+$primary: #ff373d;
+$warning: #fbba32;
+$danger: #e41a4a;
+$secondary: #ffcccc;
+$headerColor: #b42b51;
+$secondaryButton: #2cc259;
+
+// button
+@mixin buttonStyle() {
+  border: none;
+}
+// button hover
+@mixin buttonHover($color) {
+  // opacity: 0.8;
+  background-color: $color;
+  box-shadow: 5px 10px 10px -7px $color;
+}
+// button focus
+@mixin buttonFocus($color) {
+  background-color: $color;
+}
+
+body {
+  font-family: "Poppins", sans-serif !important;
+  .logoTitle {
+    font-weight: bold;
+    font-size: 2em;
+    color: black;
+  }
+  .headerColor {
+    background-color: $headerColor;
+    height: 50px;
+    width: 100%;
+  }
+  .authPage {
+    background-image: linear-gradient(
+      to bottom right,
+      $secondary 30%,
+      $primary 70%
+    );
+  }
+  .btnLogin {
+    @include buttonStyle();
+    background: linear-gradient(to right, $warning 20%, $primary 50%);
+    font-size: 15px !important;
+    letter-spacing: 2.5px;
+    font-weight: bold;
+    transition: all 0.4s !important;
+  }
+  .btnLogin:focus {
+    background: linear-gradient(to right, $warning 20%, $primary 50%);
+  }
+
+  .btnLogin:hover {
+    background: linear-gradient(to right, $warning 20%, $primary 50%);
+    opacity: 0.8 !important;
+  }
+
+  .logoutBtn {
+    position: relative;
+    z-index: 1;
+    // transition: color 200ms;
+  }
+  // .logoutBtn:hover {
+  //   color: rgba(216, 169, 15, 1);
+  // }
+  .logoutBtn::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    transform: scaleX(0);
+    transition: transform 200ms ease-in;
+    transform-origin: right;
+    background-color: rgba(216, 169, 15, 0.8);
+  }
+  .logoutBtn:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  // buttons
+  .btnPrimary {
+    background-color: $primary;
+    position: relative;
+    z-index: 1;
+    @include buttonStyle();
+  }
+
+  .btnPrimary::after {
+    content: "";
+    border-radius: 40px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: transform 200ms ease-in;
+    transform: scaleX(0);
+    transform-origin: right;
+    // z-index: -1;
+  }
+  .btnPrimary:hover::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 40px;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: transform 200ms ease-in;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .btnSecondary {
+    background-color: $secondaryButton;
+    @include buttonStyle();
+  }
+  .btnWarning {
+    background-color: $warning;
+    @include buttonStyle();
+  }
+  .btnDanger {
+    background-color: $danger;
+    @include buttonStyle();
+  }
+
+  // buttons focus
+  .btnPrimary:focus {
+    @include buttonFocus($primary);
+  }
+  .btnSecondary:focus {
+    @include buttonFocus($secondaryButton);
+  }
+  .btnWarning:focus {
+    @include buttonFocus($warning);
+  }
+  .btnDanger:focus {
+    @include buttonFocus($danger);
+  }
+
+  // buttons hover
+  .btnPrimary:hover {
+    @include buttonHover($primary);
+  }
+  .btnSecondary:hover {
+    @include buttonHover($secondaryButton);
+  }
+  .btnWarning:hover {
+    @include buttonHover($warning);
+  }
+  .btnDanger:hover {
+    @include buttonHover($danger);
+  }
+
+  .authHeading {
+    font-size: 40px;
+    letter-spacing: 10px;
+    color: $primary;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    text-shadow: 5px 5px 3px rgb(212, 212, 212);
+  }
+
+  .logoTitle:hover {
+    color: black;
+  }
+  //  sidebar selected menu
+  .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+    background-color: #ffe4e4;
+  }
+  .ant-menu-vertical .ant-menu-item::after,
+  .ant-menu-vertical-left .ant-menu-item::after,
+  .ant-menu-vertical-right .ant-menu-item::after,
+  .ant-menu-inline .ant-menu-item::after {
+    border-right: 3px solid $primary;
+  }
+  .ant-layout-sider-light .ant-layout-sider-trigger {
+    color: white;
+    background-color: $headerColor;
+    font-weight: bold;
+  }
+  .ant-tooltip-inner .text-decoration-none {
+    color: white !important;
+    font-weight: 400;
+  }
+  button {
+    border-radius: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .scroll::-webkit-scrollbar {
+    width: 5px;
+    background-color: #dad9d9;
+  }
+  .scroll::-webkit-scrollbar-thumb {
+    background-color: $secondary;
+    border-radius: 5px;
+  }
+
+  .loginForm {
+    border-radius: 20px;
+  }
+  .loginForm:hover {
+    border: 1px solid $primary !important;
+  }
+  .loginForm:focus {
+    border: 1px solid $primary !important;
+    box-shadow: 0 0 2px $primary !important;
+  }
+  .ant-input-affix-wrapper:focus,
+  .ant-input-affix-wrapper-focused {
+    box-shadow: 0 0 2px $primary !important;
+    outline: none;
+  }
+
+  // input
+  .ant-select-single.ant-select-lg:not(.ant-select-customize-input)
+    .ant-select-selector,
+  .ant-input-affix-wrapper-lg {
+    border-radius: 20px;
+  }
+
+  // Ant Modal
+  .ant-modal-header {
+    border-radius: 10px;
+  }
+  .ant-modal-body {
+    border-radius: 10px;
+  }
+  .ant-modal-content {
+    border-radius: 10px;
+  }
+  input {
+    border-radius: 20px !important;
+  }
+
+  // center
+  .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .endItems {
+    display: flex;
+    justify-content: end;
+    // align-items: center;
+  }
+
+  .ant-tooltip-inner > a {
+    color: white !important;
+    font-weight: 400 !important;
+  }
+
+  // transition
+  .my-node-enter {
+    transform: translate3d(100%, 0, 0);
+    opacity: 0;
+  }
+  .my-node-enter-active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: all 300ms;
+  }
+  .my-node-exit {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  .my-node-exit-active {
+    opacity: 0;
+    transform: translate3d(-100%, 0, 0);
+    transition: all 300ms;
+  }
+  .font18 {
+    font-size: 18px;
+  }
+  .cardLayout {
+    border-radius: 10px;
+    padding: 5px;
+    background-color: white;
+    min-height: 300px;
+    box-shadow: 2px 2px 6px #ecabad;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+    // cursor: pointer;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: #dcfdd1;
+  }
+  .ant-table-tbody > tr:hover > td {
+    background-color: #f0ffec !important;
+  }
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    border-radius: 20px;
+  }
+}

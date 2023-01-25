@@ -1,0 +1,408 @@
+body {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+body .logoTitle {
+  font-weight: bold;
+  font-size: 2em;
+  color: black;
+}
+
+body .headerColor {
+  background-color: #b42b51;
+  height: 50px;
+  width: 100%;
+}
+
+body .authPage {
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right bottom,
+    color-stop(30%, #ffcccc),
+    color-stop(70%, #ff373d)
+  );
+  background-image: linear-gradient(to bottom right, #ffcccc 30%, #ff373d 70%);
+}
+
+body .btnLogin {
+  border: none;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    color-stop(20%, #fbba32),
+    color-stop(50%, #ff373d)
+  );
+  background: linear-gradient(to right, #fbba32 20%, #ff373d 50%);
+  font-size: 15px !important;
+  letter-spacing: 2.5px;
+  font-weight: bold;
+  -webkit-transition: all 0.4s !important;
+  transition: all 0.4s !important;
+}
+
+body .btnLogin:focus {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    color-stop(20%, #fbba32),
+    color-stop(50%, #ff373d)
+  );
+  background: linear-gradient(to right, #fbba32 20%, #ff373d 50%);
+}
+
+body .btnLogin:hover {
+  background: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    color-stop(20%, #fbba32),
+    color-stop(50%, #ff373d)
+  );
+  background: linear-gradient(to right, #fbba32 20%, #ff373d 50%);
+  opacity: 0.8 !important;
+}
+
+body .logoutBtn {
+  position: relative;
+  z-index: 1;
+}
+
+body .logoutBtn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  -webkit-transition: -webkit-transform 200ms ease-in;
+  transition: -webkit-transform 200ms ease-in;
+  transition: transform 200ms ease-in;
+  transition: transform 200ms ease-in, -webkit-transform 200ms ease-in;
+  -webkit-transform-origin: right;
+  transform-origin: right;
+  background-color: rgba(216, 169, 15, 0.8);
+}
+
+body .logoutBtn:hover::after {
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+  -webkit-transform-origin: left;
+  transform-origin: left;
+}
+
+body .btnPrimary {
+  background-color: #ff373d;
+  position: relative;
+  z-index: 1;
+  border: none;
+}
+
+body .btnPrimary::after {
+  content: '';
+  border-radius: 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  -webkit-transition: -webkit-transform 200ms ease-in;
+  transition: -webkit-transform 200ms ease-in;
+  transition: transform 200ms ease-in;
+  transition: transform 200ms ease-in, -webkit-transform 200ms ease-in;
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  -webkit-transform-origin: right;
+  transform-origin: right;
+}
+
+body .btnPrimary:hover::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 40px;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  -webkit-transition: -webkit-transform 200ms ease-in;
+  transition: -webkit-transform 200ms ease-in;
+  transition: transform 200ms ease-in;
+  transition: transform 200ms ease-in, -webkit-transform 200ms ease-in;
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+  -webkit-transform-origin: left;
+  transform-origin: left;
+}
+
+body .btnSecondary {
+  background-color: #2cc259;
+  border: none;
+}
+
+body .btnWarning {
+  background-color: #fbba32;
+  border: none;
+}
+
+body .btnDanger {
+  background-color: #e41a4a;
+  border: none;
+}
+
+body .btnPrimary:focus {
+  background-color: #ff373d;
+}
+
+body .btnSecondary:focus {
+  background-color: #2cc259;
+}
+
+body .btnWarning:focus {
+  background-color: #fbba32;
+}
+
+body .btnDanger:focus {
+  background-color: #e41a4a;
+}
+
+body .btnPrimary:hover {
+  background-color: #ff373d;
+  -webkit-box-shadow: 5px 10px 10px -7px #ff373d;
+  box-shadow: 5px 10px 10px -7px #ff373d;
+}
+
+body .btnSecondary:hover {
+  background-color: #2cc259;
+  -webkit-box-shadow: 5px 10px 10px -7px #2cc259;
+  box-shadow: 5px 10px 10px -7px #2cc259;
+}
+
+body .btnWarning:hover {
+  background-color: #fbba32;
+  -webkit-box-shadow: 5px 10px 10px -7px #fbba32;
+  box-shadow: 5px 10px 10px -7px #fbba32;
+}
+
+body .btnDanger:hover {
+  background-color: #e41a4a;
+  -webkit-box-shadow: 5px 10px 10px -7px #e41a4a;
+  box-shadow: 5px 10px 10px -7px #e41a4a;
+}
+
+body .authHeading {
+  font-size: 40px;
+  letter-spacing: 10px;
+  color: #ff373d;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  text-shadow: 5px 5px 3px #d4d4d4;
+}
+
+body .logoTitle:hover {
+  color: black;
+}
+
+body .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: #ffe4e4;
+}
+
+body .ant-menu-vertical .ant-menu-item::after,
+body .ant-menu-vertical-left .ant-menu-item::after,
+body .ant-menu-vertical-right .ant-menu-item::after,
+body .ant-menu-inline .ant-menu-item::after {
+  border-right: 3px solid #ff373d;
+}
+
+body .ant-layout-sider-light .ant-layout-sider-trigger {
+  color: white;
+  background-color: #b42b51;
+  font-weight: bold;
+}
+
+body .ant-tooltip-inner .text-decoration-none {
+  color: white !important;
+  font-weight: 400;
+}
+
+body button {
+  border-radius: 40px !important;
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -webkit-box-align: center !important;
+  -ms-flex-align: center !important;
+  align-items: center !important;
+  -webkit-box-pack: center !important;
+  -ms-flex-pack: center !important;
+  justify-content: center !important;
+}
+
+body .scroll::-webkit-scrollbar {
+  width: 5px;
+  background-color: #dad9d9;
+}
+
+body .scroll::-webkit-scrollbar-thumb {
+  background-color: #ffcccc;
+  border-radius: 5px;
+}
+
+body .loginForm {
+  border-radius: 20px;
+}
+
+body .loginForm:hover {
+  border: 1px solid #ff373d !important;
+}
+
+body .loginForm:focus {
+  border: 1px solid #ff373d !important;
+  -webkit-box-shadow: 0 0 2px #ff373d !important;
+  box-shadow: 0 0 2px #ff373d !important;
+}
+
+body .ant-input-affix-wrapper:focus,
+body .ant-input-affix-wrapper-focused {
+  -webkit-box-shadow: 0 0 2px #ff373d !important;
+  box-shadow: 0 0 2px #ff373d !important;
+  outline: none;
+}
+
+body
+  .ant-select-single.ant-select-lg:not(.ant-select-customize-input)
+  .ant-select-selector,
+body .ant-input-affix-wrapper-lg {
+  border-radius: 20px;
+}
+
+body .ant-modal-header {
+  border-radius: 10px;
+}
+
+body .ant-modal-body {
+  border-radius: 10px;
+}
+
+body .ant-modal-content {
+  border-radius: 10px;
+}
+
+body input {
+  border-radius: 20px !important;
+}
+
+body .center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+body .endItems {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: end;
+}
+
+body .ant-tooltip-inner > a {
+  color: white !important;
+  font-weight: 400 !important;
+}
+
+body .my-node-enter {
+  -webkit-transform: translate3d(100%, 0, 0);
+  transform: translate3d(100%, 0, 0);
+  opacity: 0;
+}
+
+body .my-node-enter-active {
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-transition: all 300ms;
+  transition: all 300ms;
+}
+
+body .my-node-exit {
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+body .my-node-exit-active {
+  opacity: 0;
+  -webkit-transform: translate3d(-100%, 0, 0);
+  transform: translate3d(-100%, 0, 0);
+  -webkit-transition: all 300ms;
+  transition: all 300ms;
+}
+
+body .font18 {
+  font-size: 18px;
+}
+
+body .cardLayout {
+  border-radius: 10px;
+  padding: 5px;
+  background-color: white;
+  min-height: 300px;
+  -webkit-box-shadow: 2px 2px 6px #ecabad;
+  box-shadow: 2px 2px 6px #ecabad;
+  -webkit-transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+body .ant-table-thead > tr > th {
+  background-color: #dcfdd1;
+}
+
+body .ant-table-tbody > tr:hover > td {
+  background-color: #f0ffec !important;
+}
+
+body .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-radius: 20px;
+}
+.threedots span {
+  /* width: 160px;  */
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.threedotswith-four-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/*# sourceMappingURL=index.css.map */
+
+.ant-layout-sider.ant-layout-sider-light {
+  height: 100%;
+}
+
+.ant-popover-buttons {
+  display: flex;
+  justify-content: end;
+}
+
+.ant-input-affix-wrapper > input.ant-input {
+  padding: inherit;
+}
+
+.ant-input-affix-wrapper-lg {
+  padding: 4px 11px;
+}
