@@ -1,6 +1,3 @@
-/* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable no-loop-func */
-/* eslint-disable array-callback-return */
 import {
   DeleteOutlined,
   PlusOutlined,
@@ -71,7 +68,7 @@ const colStyle = {
   overflowX: 'hidden',
 }
 
-const Products = () => {
+const Orders = () => {
   // id of admin
   const sendMailFunc = firebase.functions().httpsCallable('sendMail')
   const [fileName, setFileName] = useState('')
@@ -82,6 +79,7 @@ const Products = () => {
   const [colorSearch, setColorSearch] = useState('')
   const [clothTypeSearch, setClothTypeSearch] = useState('')
   const [brands, setBrands] = useState([])
+  const [orders, setOrders] = useState([])
   const [interSearch, setInterSearch] = useState('')
   const [recSearch, setRecSearch] = useState('')
   const user = useSelector((state) => state.user.user)
@@ -147,95 +145,90 @@ const Products = () => {
   }
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'First Name',
+      dataIndex: 'first_name',
+      key: 'first_name',
     },
     {
-      title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
-      render: (category) => (
-        <div style={colStyle} className="scroll">
-          <Tag className="rounded-pill my-1" color="cyan">
-            {categ?.find((cat) => cat.id === category)?.name}
-          </Tag>
-        </div>
-      ),
+      title: 'Last Name',
+      dataIndex: 'last_name',
+      key: 'last_name',
     },
     {
-      title: 'Colors',
-      dataIndex: 'colors',
-      key: 'colors',
-      render: (colorsArr) => (
-        <div style={colStyle} className="scroll">
-          {colorsArr &&
-            colorsArr?.map((item) => (
-              <Tag className="rounded-pill my-1" color="cyan">
-                {colors?.find((cat) => cat.id === item)?.name}
-              </Tag>
-            ))}
-        </div>
-      ),
+      title: 'Order Date',
+      dataIndex: 'orderDate',
+      key: 'orderDate',
     },
     {
-      title: 'Brand',
-      dataIndex: 'brand',
-      key: 'brand',
-      render: (brandId) => (
-        <div style={colStyle} className="scroll">
-          <Tag className="rounded-pill my-1" color="cyan">
-            {brands?.find((brand) => brand.id === brandId)?.name}
-          </Tag>
-        </div>
-      ),
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
     },
     {
-      title: 'Cloth Type',
-      dataIndex: 'cloth_type',
-      key: 'cloth_type',
-      render: (clothTypeId) => (
-        <div style={colStyle} className="scroll">
-          <Tag className="rounded-pill my-1" color="cyan">
-            {
-              clothTypes?.find((clothType) => clothType.id === clothTypeId)
-                ?.name
-            }
-          </Tag>
-        </div>
-      ),
+      title: 'Payable Amount',
+      dataIndex: 'payableAmount',
+      key: 'payableAmount',
     },
     {
-      title: 'Price (£)',
-      dataIndex: 'price',
-      key: 'price',
-      render: (price, item) => {
-        if (item.discount === '' || !item.discount || item.discount === '0') {
-          return item.price
-        } else {
-          return (
-            <span>
-              <del className="text-danger fst-italic me-2">
-                {item.originalPrice}
-              </del>
-              <Tooltip title="Discounted Price">
-                <Tag className="fw-bold rounded-pill" color="orange">
-                  {item.price}
-                </Tag>
-              </Tooltip>
-            </span>
-          )
-        }
-      },
-      sorter: (a, b) => a.price - b.price,
+      title: 'Order Status',
+      dataIndex: 'orderStatus',
+      key: 'orderStatus',
     },
+    // {
+    //   title: 'Products',
+    //   dataIndex: 'products',
+    //   key: 'products',
+    //   render: (category) => (
+    //     <div style={colStyle} className="scroll">
+    //       <Tag className="rounded-pill my-1" color="cyan">
+    //         {categ?.find((cat) => cat.id === category)?.name}
+    //       </Tag>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   title: 'Brand',
+    //   dataIndex: 'brand',
+    //   key: 'brand',
+    //   render: (brandId) => (
+    //     <div style={colStyle} className="scroll">
+    //       <Tag className="rounded-pill my-1" color="cyan">
+    //         {brands?.find((brand) => brand.id === brandId)?.name}
+    //       </Tag>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   title: 'Price (£)',
+    //   dataIndex: 'price',
+    //   key: 'price',
+    //   render: (price, item) => {
+    //     if (item.discount === '' || !item.discount || item.discount === '0') {
+    //       return item.price
+    //     } else {
+    //       return (
+    //         <span>
+    //           <del className="text-danger fst-italic me-2">
+    //             {item.originalPrice}
+    //           </del>
+    //           <Tooltip title="Discounted Price">
+    //             <Tag className="fw-bold rounded-pill" color="orange">
+    //               {item.price}
+    //             </Tag>
+    //           </Tooltip>
+    //         </span>
+    //       )
+    //     }
+    //   },
+    //   sorter: (a, b) => a.price - b.price,
+    // },
     {
       title: 'Actions',
       dataIndex: 'id',
       key: 'id',
       render: (id, item) => (
         <div className="d-flex">
-          <Tooltip title={`Edit ${item.name}`}>
+          {/* <Tooltip title={`Edit`}>
             <Button
               onClick={() => {
                 console.log({ item })
@@ -248,27 +241,18 @@ const Products = () => {
             >
               <i className="fa fa-edit"></i>
             </Button>
-          </Tooltip>
+          </Tooltip> */}
           <Popconfirm
-            title="Delete product?"
-            description="Are you sure to delete this product?"
+            title="Delete order?"
+            description="Are you sure to delete this order?"
             placement="topLeft"
             onConfirm={() => handleDelete(id)}
-            // onCancel={cancel}
             okText="Yes"
             cancelText="No"
           >
-            {/* <a href="#">Delete</a> */}
-            <Button
-              // onClick={() => handleDelete(id)}
-              className="btnDanger"
-              type="primary"
-              // loading={btnUpload}
-            >
+            <Button className="btnDanger" type="primary">
               <i className="fa fa-trash"></i>
             </Button>
-            {/* <Tooltip title={`Delete ${item.name}`}>
-            </Tooltip> */}
           </Popconfirm>
         </div>
       ),
@@ -276,6 +260,7 @@ const Products = () => {
   ]
 
   useEffect(() => {
+    getOrders()
     getProducts()
     getCategories() // redux
     dispatch(fetchProducts())
@@ -290,6 +275,14 @@ const Products = () => {
     let data = await getData('brands')
     if (data) {
       setBrands(data)
+    }
+  }
+
+  const getOrders = async () => {
+    let data = await getData('orders')
+    console.log(data)
+    if (data) {
+      setOrders(data)
     }
   }
 
@@ -407,7 +400,7 @@ const Products = () => {
   // }
 
   // add product in modal
-  const handleAddProduct = async (values) => {
+  const handleAddOrder = async (values) => {
     if (discount) {
       values.is_discounted = true
     } else {
@@ -424,7 +417,7 @@ const Products = () => {
     values.image = url
     values.admin = user // id of admin that posted the product
     console.log(values)
-    let response = await addDoc('products', values)
+    let response = await addDoc('orders', values)
     setBtnUpload(false)
     if (response === true) {
       message.success('Product Created Successfully!')
@@ -452,19 +445,17 @@ const Products = () => {
   }
   // delete product
   const handleDelete = async (id) => {
-    let prod = productsRedux.products.find((item) => item.id === id)
+    let order = orders?.find((item) => item.id === id)
     // setBtnUpload(true)
     setisLoading(true)
     await firebase
       .firestore()
-      .collection('products')
+      .collection('orders')
       .doc(id)
       .delete()
       .then(() => {
-        message.success('Product Deleted!')
-        deleteStorageFiles(prod.image)
-        getProducts()
-        dispatch(fetchProducts())
+        message.success('Order Deleted!')
+        getOrders()
         setisLoading(false)
       })
       .catch((error) => {
@@ -746,7 +737,7 @@ const Products = () => {
       <Container>
         <Tabs animated activeKey={key}>
           <TabPane key="1">
-            <Row>
+            {/* <Row>
               <Col>
                 <Button
                   type="primary"
@@ -756,21 +747,21 @@ const Products = () => {
                   onClick={() => setShow(true)}
                   size="large"
                 >
-                  Add Product
+                  Add Order
                 </Button>
               </Col>
-            </Row>
+            </Row> */}
             <Row className="my-2">
               <Col className="d-flex justify-content-center">
                 <Tag
                   className="my-2 rounded-pill font18 px-3 py-2"
                   color="blue"
                 >
-                  Total Products: {search ? search.length : 0}
+                  Total Orders: {orders ? orders.length : 0}
                 </Tag>
               </Col>
             </Row>
-            <Row className="mb-2 d-flex justify-content-end mb-3">
+            {/* <Row className="mb-2 d-flex justify-content-end mb-3">
               <Col md={4} className="d-flex">
                 <Input
                   type="text"
@@ -778,12 +769,12 @@ const Products = () => {
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </Col>
-            </Row>
+            </Row> */}
             <Row>
               <Col>
                 <Table
                   bordered
-                  dataSource={search}
+                  dataSource={orders}
                   columns={columns}
                   scroll={{ x: true }}
                   loading={isLoading}
@@ -792,26 +783,52 @@ const Products = () => {
                     showSizeChanger: true,
                   }}
                   rowKey={(item) => item.id}
-                  expandable={{
-                    expandedRowRender: (item) => {
-                      return (
-                        <div>
-                          <Row>
-                            <Col>
-                              <Space direction="vertical" wrap>
-                                <strong>Product ID</strong>
-                                <p>{item?.id ?? ''}</p>
-                                <strong>Description:</strong>
-                                <p style={{ margin: 0, textAlign: 'justify' }}>
-                                  {item.description}
-                                </p>
-                              </Space>
-                            </Col>
-                          </Row>
-                        </div>
-                      )
-                    },
-                  }}
+                //   expandable={{
+                //     expandedRowRender: (item) => {
+                //       return (
+                //         <div>
+                //           <Row>
+                //             <Col>
+                //               <Space direction="vertical" wrap className='w-1002'>
+                //                 <strong>Order ID</strong>
+                //                 <p>{item?.id ?? ''}</p>
+                //                 {/* <strong>Description:</strong>
+                //                 <p style={{ margin: 0, textAlign: 'justify' }}>
+                //                   {item.description}
+                //                 </p> */}
+                //                 <div className="row">
+                //                   <div className="col-12">
+                //                     <strong>Order Date</strong>
+                //                     <p>{item?.orderDate}</p>
+                //                   </div>
+                //                 </div>
+                //                 <div className="row">
+                //                   <div className="col-6">
+                //                     <strong>First Name</strong>
+                //                     <p>{item?.first_name}</p>
+                //                   </div>
+                //                   <div className="col-6">
+                //                     <strong>Last Name</strong>
+                //                     <p>{item?.last_name}</p>
+                //                   </div>
+                //                 </div>
+                //                 <div className="row">
+                //                   {/* <div className="col-6">
+                //                     <strong>Price</strong>
+                //                     <p>{item?.price}</p>
+                //                   </div> */}
+                //                   <div className="col-6">
+                //                     <strong>Order Status</strong>
+                //                     <p>{item?.orderStatus}</p>
+                //                   </div>
+                //                 </div>
+                //               </Space>
+                //             </Col>
+                //           </Row>
+                //         </div>
+                //       )
+                //     },
+                //   }}
                 />
               </Col>
             </Row>
@@ -1260,7 +1277,7 @@ const Products = () => {
         </BackTop>
         {/* add new product */}
         <Modal
-          title="Add Product"
+          title="Add Order"
           visible={show}
           footer={false}
           onCancel={handleModalClose}
@@ -1270,7 +1287,7 @@ const Products = () => {
             size="large"
             form={form}
             layout="vertical"
-            onFinish={handleAddProduct}
+            onFinish={handleAddOrder}
           >
             <Row>
               <Col md={6}>
@@ -1618,39 +1635,8 @@ const Products = () => {
           </Form>
         </Modal>
       </Container>
-      {/* {beforeUpload && (
-        <Modal
-          title="Change Image Name"
-          visible={fileModal}
-          onCancel={() => setFileModal(false)}
-          footer={null}
-        >
-          {beforeUpload.image.fileList?.map((item, idx) => (
-            <div>
-              <div className="d-flex justify-content-center">
-                <Image
-                  preview={false}
-                  src={item.thumbUrl}
-                  alt={item.name}
-                  width="100px"
-                  height="100px"
-                />
-              </div>
-              <Input
-                defaultValue={item.name}
-                onChange={(e) => handleChangeFileName(e.target.value, idx)}
-              />
-            </div>
-          ))}
-          <div className="d-flex justify-content-end mt-3">
-            <Button onClick={handleOkFileModal} type="primary">
-              Save
-            </Button>
-          </div>
-        </Modal>
-      )} */}
     </>
   )
 }
 
-export default Products
+export default Orders

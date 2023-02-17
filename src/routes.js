@@ -30,6 +30,7 @@ import DontSellmyInfo from './Pages/DontSellmyInfo'
 import Brands from './Pages/Brands'
 import ClothTypes from './Pages/ClothTypes'
 import SizeChart from './Pages/SizeChart'
+import Orders from './Pages/Orders';
 
 export const routes = [
   // {
@@ -77,6 +78,14 @@ export const routes = [
     name: 'Size Chart',
     icon: () => <ShopOutlined />,
     component: SizeChart,
+    layout: 'admin',
+    sidebar: true,
+  },
+  {
+    path: '/orders',
+    name: 'Orders',
+    icon: () => <ShopOutlined />,
+    component: Orders,
     layout: 'admin',
     sidebar: true,
   },
