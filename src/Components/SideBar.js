@@ -55,7 +55,7 @@ const SideBar = ({ collapsedWidth }) => {
         className="d-flex justify-content-center align-items-center"
         style={{ marginTop: '70px' }}
       >
-        <Link to="/statistics" className="logoTitle">
+        <Link to="/" className="logoTitle">
           {collapsedWidth === 230 ? (
             <animated.span style={fade}>
               <img src={Logo} alt="" className="w-100" />

@@ -1,6 +1,3 @@
-/* eslint-disable react/jsx-no-target-blank */
-/* eslint-disable no-loop-func */
-/* eslint-disable array-callback-return */
 import {
   DeleteOutlined,
   PlusOutlined,
@@ -47,15 +44,7 @@ import {
 } from '../Firebase/utils'
 import { addCategory, fetchCategories } from '../Redux/Actions/categories'
 import { addInterest, fetchInterests } from '../Redux/Actions/interest'
-import { addOccasions, fetchOccasions } from '../Redux/Actions/occasions'
 import { fetchProducts, updateProduct } from '../Redux/Actions/products'
-import { addRecipient, fetchRecipients } from '../Redux/Actions/recipients'
-import {
-  mapCategories,
-  mapInterests,
-  mapOccasions,
-  mapRecipients,
-} from '../utils/map'
 import { backToTop } from './styles/styles'
 
 const { Item } = Form
@@ -106,10 +95,7 @@ const Products = () => {
   const [discount, setDiscount] = useState('')
   const [discountedPrice, setDiscountedPrice] = useState(0)
   const [originalPrice, setOriginalPrice] = useState(null)
-  const [previewLink, setPreviewLink] = useState('')
   const [beforeUpload, setBeforeUpload] = useState(null)
-  const [fileModal, setFileModal] = useState(false)
-  const [spaceWarnigShow, setspaceWarnigShow] = useState(false)
   const [text, setText] = React.useState('')
   const [allWishlist, setAllWishlist] = React.useState('')
   const currentdateTime = moment().format('DD-MM-YYYY hh:mm:ss A')
@@ -121,30 +107,6 @@ const Products = () => {
   const recipientsRedux = useSelector((state) => state.recipients)
   const productsRedux = useSelector((state) => state.products)
 
-  const handleFeature = async (feature) => {
-    console.log(feature)
-    if (feature.stats.featured === false) {
-      feature.stats.featured = true
-      await updateProduct(feature?.id, feature)
-      await getProducts()
-      await dispatch(fetchProducts())
-    } else {
-      feature.stats.featured = false
-      await updateProduct(feature?.id, feature)
-      await getProducts()
-      await dispatch(fetchProducts())
-    }
-    await getProducts()
-    await dispatch(fetchProducts())
-    const count = productsRedux?.products.filter((obj) => {
-      if (obj.stats.featured === true) {
-        return true
-      }
-
-      return false
-    }).length
-    setfeaturedCount(() => count)
-  }
   const columns = [
     {
       title: 'Name',
@@ -189,6 +151,18 @@ const Products = () => {
           </Tag>
         </div>
       ),
+    },
+    {
+      title: 'Stock',
+      dataIndex: 'stock',
+      key: 'stock',
+      // render: (brandId) => (
+      //   <div style={colStyle} className="scroll">
+      //     <Tag className="rounded-pill my-1" color="cyan">
+      //       {brands?.find((brand) => brand.id === brandId)?.name}
+      //     </Tag>
+      //   </div>
+      // ),
     },
     {
       title: 'Cloth Type',
@@ -348,27 +322,6 @@ const Products = () => {
     }
   }
 
-  // occasions
-  // const getOccasions = async () => {
-  //   if (occasionsRedux.isLoading === true) {
-  //     dispatch(fetchOccasions())
-  //   }
-  // }
-
-  // // interests
-  // const getInterests = async () => {
-  //   if (interestsRedux.isLoading) {
-  //     dispatch(fetchInterests())
-  //   }
-  // }
-
-  // // recipients
-  // const getRecipients = async () => {
-  //   if (recipientsRedux.isLoading) {
-  //     dispatch(fetchRecipients())
-  //   }
-  // }
-
   // search in products
   const handleSearch = (value) => {
     value = value.trim().toLowerCase()
@@ -383,28 +336,6 @@ const Products = () => {
     }
     setSearch(arr)
   }
-
-  // const handleChangeFileName = (fileName, idx) => {
-  //   let obj = cloneDeep(beforeUpload)
-  //   let arr = [...obj.image.fileList]
-
-  //   Object.defineProperty(arr[idx], 'name', {
-  //     writable: true,
-  //     value: fileName,
-  //   })
-  //   Object.defineProperty(arr[idx].originFileObj, 'name', {
-  //     writable: true,
-  //     value: fileName,
-  //   })
-  //   obj = {
-  //     ...obj,
-  //     image: {
-  //       ...obj.image,
-  //       fileList: arr,
-  //     },
-  //   }
-  //   setBeforeUpload(obj)
-  // }
 
   // add product in modal
   const handleAddProduct = async (values) => {
@@ -423,7 +354,8 @@ const Products = () => {
     const url = await multiImageUpload('products', values.image.fileList)
     values.image = url
     values.admin = user // id of admin that posted the product
-    console.log(values)
+    let sizes = values?.sizes?.map(size => size?.toLowerCase())
+    values.sizes = sizes
     let response = await addDoc('products', values)
     setBtnUpload(false)
     if (response === true) {
@@ -585,9 +517,11 @@ const Products = () => {
     values.originalPrice = originalPrice
     values.price = discountedPrice === 0 ? values.price : discountedPrice
     values.customLink = text
+    let sizes = values?.sizes?.map(size => size?.toLowerCase())
+    values.sizes = sizes
 
     await firebase
-      .firestore()
+      .firestore()  
       .collection('products')
       .doc(edit.id)
       .set(values, { merge: true })
@@ -601,52 +535,6 @@ const Products = () => {
   }
 
   const handleEdit = (item) => {
-    // Object.entries(item)?.map(([key, value]) => {
-    //   if (key === 'image') {
-    //     return
-    //   }
-    //   if (key === 'category') {
-    //     let arr = item.category?.map((item) => item.id)
-    //     console.log(arr)
-    //     editForm.setFieldsValue({
-    //       [key]: arr,
-    //     })
-    //     return
-    //   }
-    //   if (key === 'occasions') {
-    //     let arr = item.occasions?.map((item) => item.id)
-    //     console.log(arr)
-    //     editForm.setFieldsValue({
-    //       [key]: arr,
-    //     })
-    //     return
-    //   }
-    //   if (key === 'interests') {
-    //     let arr = item.interests?.map((item) => item.id)
-    //     console.log(arr)
-    //     editForm.setFieldsValue({
-    //       [key]: arr,
-    //     })
-    //     return
-    //   }
-    //   if (key === 'recipients') {
-    //     let arr = item.recipients?.map((item) => item.id)
-    //     console.log(arr)
-    //     editForm.setFieldsValue({
-    //       [key]: arr,
-    //     })
-    //     return
-    //   }
-    //   if (key === 'price') {
-    //     editForm.setFieldsValue({
-    //       [key]: item.originalPrice ?? value,
-    //     })
-    //     return
-    //   }
-    //   editForm.setFieldsValue({
-    //     [key]: value,
-    //   })
-    // })
     editForm.setFieldsValue({ ...item })
     setDiscountType(item.discountType)
     setDiscount(item.discount ?? '')
@@ -1299,6 +1187,26 @@ const Products = () => {
             <Row>
               <Col md={6}>
                 <Item
+                  label="Stock"
+                  name="stock"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please enter available stock!',
+                    },
+                  ]}
+                  className="fw-bold"
+                >
+                  <Input
+                    onChange={(e) => setOriginalPrice(e.target.value)}
+                    type="number"
+                  />
+                </Item>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={6}>
+                <Item
                   name="price"
                   label="Price"
                   className="fw-bold"
@@ -1321,14 +1229,14 @@ const Products = () => {
                           <Radio.Group
                             onChange={(e) => {
                               setDiscountType(e.target.value)
-                              handleDiscount(discount)
+                              handleDiscount(0)
                             }}
                             value={discountType}
                           >
                             <Radio title="Flat Discount" value="£">
                               £
                             </Radio>
-                            <Radio title="Percentage Discount" value="£">
+                            <Radio title="Percentage Discount" value="%">
                               %
                             </Radio>
                           </Radio.Group>
@@ -1342,6 +1250,9 @@ const Products = () => {
                     name="discount"
                     onChange={(e) => handleDiscount(e.target.value)}
                     min={0}
+                    max={
+                      discountType === '%' ? 90 : form.getFieldValue('price')
+                    }
                     value={discount}
                     prefix={discountType}
                     type="number"
@@ -1350,7 +1261,10 @@ const Products = () => {
                 <span>
                   <strong>
                     Discounted Price:{' '}
-                    <span className="text-primary"> £ {discountedPrice}</span>
+                    <span className="text-primary">
+                      {' '}
+                      {discountType} {discountedPrice}
+                    </span>
                   </strong>
                 </span>
               </Col>

@@ -103,7 +103,7 @@ export const getUserByID = async (ids) => {
         console.log(doc.id, ' => ', doc.data())
       })
     })
-    .catch(function (error) {
+    .catch(function (error) { 
       console.log('Error getting documents: ', error)
     })
 }

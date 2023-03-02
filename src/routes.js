@@ -30,7 +30,8 @@ import DontSellmyInfo from './Pages/DontSellmyInfo'
 import Brands from './Pages/Brands'
 import ClothTypes from './Pages/ClothTypes'
 import SizeChart from './Pages/SizeChart'
-import Orders from './Pages/Orders';
+import Orders from './Pages/Orders'
+import SpecialOffer from './Pages/SpecialOffer'
 
 export const routes = [
   // {
@@ -110,6 +111,14 @@ export const routes = [
     name: 'Cloth Types',
     icon: () => <BarsOutlined />,
     component: ClothTypes,
+    layout: 'admin',
+    sidebar: true,
+  },
+  {
+    path: '/special-offer',
+    name: 'Special Offer',
+    icon: () => <BarsOutlined />,
+    component: SpecialOffer,
     layout: 'admin',
     sidebar: true,
   },
