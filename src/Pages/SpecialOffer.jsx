@@ -114,11 +114,6 @@ const SpecialOffer = () => {
         <Container>
           <div className="mt-5 d-flex align-items-center gap-3">
             <h3 className="m-0">Special Offer</h3>
-            <p>
-              <b>*Note: </b>Products with discount cannot be added to special
-              offer. Discount should be removed from products in order to add
-              them to special offer.
-            </p>
             <div className="d-flex align-items-center gap-2">
               {offerDetail?.isActive === true && (
                 <Button
@@ -142,6 +137,11 @@ const SpecialOffer = () => {
               )}
             </div>
           </div>
+          <p className='mt-3'>
+            <b>*Note: </b>Products with discount cannot be added to special
+            offer. Discount should be removed from products in order to add them
+            to special offer.
+          </p>
           {offerDetail?.isActive && (
             <>
               <div className="mt-3" style={{ marginTop: '1px solid' }}>

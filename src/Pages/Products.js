@@ -353,8 +353,9 @@ const Products = () => {
     setBtnUpload(true)
     const url = await multiImageUpload('products', values.image.fileList)
     values.image = url
+    values.stock = Number(values?.stock)
     values.admin = user // id of admin that posted the product
-    let sizes = values?.sizes?.map(size => size?.toLowerCase())
+    let sizes = values?.sizes?.map((size) => size?.toLowerCase())
     values.sizes = sizes
     let response = await addDoc('products', values)
     setBtnUpload(false)
@@ -517,11 +518,12 @@ const Products = () => {
     values.originalPrice = originalPrice
     values.price = discountedPrice === 0 ? values.price : discountedPrice
     values.customLink = text
-    let sizes = values?.sizes?.map(size => size?.toLowerCase())
+    let sizes = values?.sizes?.map((size) => size?.toLowerCase())
     values.sizes = sizes
+    values.stock = Number(values.stock)
 
     await firebase
-      .firestore()  
+      .firestore()
       .collection('products')
       .doc(edit.id)
       .set(values, { merge: true })
@@ -530,7 +532,7 @@ const Products = () => {
         handleBack()
         getProducts()
         dispatch(fetchProducts())
-      })
+      }) 
     setBtnUpload(false)
   }
 
@@ -754,7 +756,7 @@ const Products = () => {
                     </Col>
                   </Row>
                   <Row>
-                    <Col md={6}>
+                    <Col md={4}>
                       <Item
                         name="price"
                         label="Price"
@@ -770,7 +772,7 @@ const Products = () => {
                         />
                       </Item>
                     </Col>
-                    <Col>
+                    <Col md={4}>
                       <Item
                         label={
                           <>
@@ -815,6 +817,22 @@ const Products = () => {
                           </span>
                         </strong>
                       </span>
+                    </Col>
+                    <Col md={4}>
+                      <Item
+                        name="stock"
+                        label="Stock"
+                        className="fw-bold"
+                        rules={[
+                          { required: true, message: 'Please enter stock!' },
+                        ]}
+                      >
+                        <Input
+                          onChange={(e) => setOriginalPrice(e.target.value)}
+                          prefix={<PoundCircleFilled />}
+                          type="number"
+                        />
+                      </Item>
                     </Col>
                   </Row>
                   <Row>
@@ -1044,7 +1062,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select cloth type!',
+                            message: 'Please select size!',
                           },
                         ]}
                         className="fw-bold"
@@ -1068,7 +1086,7 @@ const Products = () => {
                     </Col>
                     <Col md={6}>
                       <Item
-                        label="Image"
+                        label="New Image(s)"
                         name="image"
                         // rules={[
                         //   { required: true, message: 'Please select images!' },
@@ -1093,7 +1111,7 @@ const Products = () => {
                   </Row>
                   <Row>
                     <Col>
-                      <Item label="Existing Images" className="fw-bold d-flex">
+                      <Item label="Product Images" className="fw-bold d-flex">
                         {edit &&
                           edit?.image?.map((item, index) => (
                             <div className="position-relative d-flex">

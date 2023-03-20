@@ -14,6 +14,7 @@ import {
   Input,
   message,
   Modal,
+  Popconfirm,
   Row,
   Select,
   Space,
@@ -87,17 +88,22 @@ const Brands = () => {
           >
             <EditFilled />
           </Button>
+          <Popconfirm
+            title="Delete brand?"
+            description="Are you sure to delete this brand?"
+            placement="topLeft"
+            onConfirm={() => handleDeleteBrand(id)}
+            // onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
           <Button
-            loading={actionBtnId === id}
-            onClick={() => {
-              handleDeleteBrand(id)
-              // setActionBtnId(id)
-              // handleDelete(id)
-            }}
+            // loading={actionBtnId === id}
             className="btnDanger text-white"
           >
             <DeleteFilled />
           </Button>
+          </Popconfirm>
         </Space>
       ),
     },

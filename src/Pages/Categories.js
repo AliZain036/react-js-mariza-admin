@@ -14,6 +14,7 @@ import {
   Card,
   Avatar,
   Image,
+  Popconfirm,
 } from 'antd'
 import { firebase } from '../Firebase/config'
 import { cloneDeep, some } from 'lodash'
@@ -78,14 +79,23 @@ const Categories = () => {
           >
             <i className="fa fa-edit"></i>
           </Button>
-          <Button
-            onClick={() => handleDelete(id)}
-            className="btnDanger"
-            type="primary"
-            // loading={btnUpload === id}
+          <Popconfirm
+            title="Delete product?"
+            description="Are you sure to delete this product?"
+            placement="topLeft"
+            onConfirm={() => handleDelete(id)}
+            // onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
           >
-            <i className="fa fa-trash"></i>
-          </Button>
+            <Button
+              className="btnDanger"
+              type="primary"
+              // loading={btnUpload === id}
+            >
+              <i className="fa fa-trash"></i>
+            </Button>
+          </Popconfirm>
         </div>
       ),
     },

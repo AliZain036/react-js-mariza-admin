@@ -90,7 +90,7 @@ const Login = () => {
                     <img src={Logo} alt="" className="w-75 py-2" />
                   </Col>
                 </Row>
-                <Row className="">
+                <Row>
                   <Col>
                     <Item
                       name="email"

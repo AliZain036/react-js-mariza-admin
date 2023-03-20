@@ -279,8 +279,10 @@ const Orders = () => {
   }
 
   const getOrders = async () => {
-    let data = await getData('orders')
-    console.log(data)
+    let response = await firebase.firestore().collection('orders').orderBy('orderDate', 'desc').get()
+    let data = response.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id }
+    })
     if (data) {
       setOrders(data)
     }

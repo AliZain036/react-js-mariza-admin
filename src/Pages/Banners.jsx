@@ -14,6 +14,7 @@ import {
   Space,
   Modal,
   Tooltip,
+  Popconfirm,
 } from 'antd'
 import {
   InboxOutlined,
@@ -88,13 +89,21 @@ const Banners = () => {
           >
             <EditFilled />
           </Button>
+          <Popconfirm
+            title="Delete banner?"
+            description="Are you sure to delete this banner?"
+            placement="topLeft"
+            onConfirm={() => handleDelete(id)}
+            // onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
           <Button
-            loading={btnLoading === id}
-            onClick={() => handleDelete(id)}
             className="btnDanger text-white"
           >
             <DeleteFilled />
           </Button>
+          </Popconfirm>
         </Space>
       ),
     },

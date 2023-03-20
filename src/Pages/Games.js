@@ -12,6 +12,7 @@ import {
   message,
   Modal,
   notification,
+  Popconfirm,
   Select,
   Space,
   Table,
@@ -147,16 +148,26 @@ const Games = () => {
               <i className="fa fa-edit"></i>
             </Button>
           </Tooltip>
-          <Tooltip title={`Delete ${item.name}`}>
+          <Popconfirm
+            title="Delete game?"
+            description="Are you sure to delete this game?"
+            placement="topLeft"
+            onConfirm={() => handleDelete(id)}
+            // onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
             <Button
-              onClick={() => handleDelete(id)}
+              // onClick={() => handleDelete(id)}
               className="btnDanger"
               type="primary"
-              loading={btnLoading}
+              // loading={btnLoading}
             >
               <i className="fa fa-trash"></i>
             </Button>
-          </Tooltip>
+          </Popconfirm>
+          {/* <Tooltip title={`Delete ${item.name}`}>
+          </Tooltip> */}
         </div>
       ),
     },
