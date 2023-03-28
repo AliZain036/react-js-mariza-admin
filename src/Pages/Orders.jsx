@@ -4,7 +4,7 @@ import {
   PoundCircleFilled,
   QuestionCircleOutlined,
   UploadOutlined,
-} from '@ant-design/icons'
+} from "@ant-design/icons"
 import {
   Avatar,
   BackTop,
@@ -26,13 +26,13 @@ import {
   Tag,
   Tooltip,
   Upload,
-} from 'antd'
-import { cloneDeep, debounce, filter, map, some } from 'lodash'
-import moment from 'moment'
-import React, { useEffect, useState } from 'react'
-import { Col, Container, Row } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import { firebase } from '../Firebase/config'
+} from "antd"
+import { cloneDeep, debounce, filter, map, some } from "lodash"
+import moment from "moment"
+import React, { useEffect, useState } from "react"
+import { Col, Container, Row } from "react-bootstrap"
+import { useDispatch, useSelector } from "react-redux"
+import { firebase } from "../Firebase/config"
 import {
   deleteStorageFiles,
   multiImageUpload,
@@ -41,47 +41,47 @@ import {
   saveData,
   addDoc,
   getData,
-} from '../Firebase/utils'
-import { addCategory, fetchCategories } from '../Redux/Actions/categories'
-import { addInterest, fetchInterests } from '../Redux/Actions/interest'
-import { addOccasions, fetchOccasions } from '../Redux/Actions/occasions'
-import { fetchProducts, updateProduct } from '../Redux/Actions/products'
-import { addRecipient, fetchRecipients } from '../Redux/Actions/recipients'
+} from "../Firebase/utils"
+import { addCategory, fetchCategories } from "../Redux/Actions/categories"
+import { addInterest, fetchInterests } from "../Redux/Actions/interest"
+import { addOccasions, fetchOccasions } from "../Redux/Actions/occasions"
+import { fetchProducts, updateProduct } from "../Redux/Actions/products"
+import { addRecipient, fetchRecipients } from "../Redux/Actions/recipients"
 import {
   mapCategories,
   mapInterests,
   mapOccasions,
   mapRecipients,
-} from '../utils/map'
-import { backToTop } from './styles/styles'
+} from "../utils/map"
+import { backToTop } from "./styles/styles"
 
 const { Item } = Form
 const { Option } = Select
 const { TabPane } = Tabs
 
 const colStyle = {
-  maxHeight: '200px',
-  maxWidth: '100%',
-  display: 'flex',
-  flexWrap: 'wrap',
-  overflowY: 'auto',
-  overflowX: 'hidden',
+  maxHeight: "200px",
+  maxWidth: "100%",
+  display: "flex",
+  flexWrap: "wrap",
+  overflowY: "auto",
+  overflowX: "hidden",
 }
 
 const Orders = () => {
   // id of admin
-  const sendMailFunc = firebase.functions().httpsCallable('sendMail')
-  const [fileName, setFileName] = useState('')
+  const sendMailFunc = firebase.functions().httpsCallable("sendMail")
+  const [fileName, setFileName] = useState("")
   const dispatch = useDispatch()
-  const [discountType, setDiscountType] = useState('%')
-  const [catSearch, setCatSearch] = useState('')
+  const [discountType, setDiscountType] = useState("%")
+  const [catSearch, setCatSearch] = useState("")
   const [productDetails, setProductDetails] = useState(null)
-  const [colorSearch, setColorSearch] = useState('')
-  const [clothTypeSearch, setClothTypeSearch] = useState('')
+  const [colorSearch, setColorSearch] = useState("")
+  const [clothTypeSearch, setClothTypeSearch] = useState("")
   const [brands, setBrands] = useState([])
   const [orders, setOrders] = useState([])
-  const [interSearch, setInterSearch] = useState('')
-  const [recSearch, setRecSearch] = useState('')
+  const [interSearch, setInterSearch] = useState("")
+  const [recSearch, setRecSearch] = useState("")
   const user = useSelector((state) => state.user.user)
   const [allProducts, setAllProducts] = useState(null)
   const [featuredCount, setfeaturedCount] = useState(0)
@@ -99,18 +99,18 @@ const Orders = () => {
   const [form] = Form.useForm()
   const [editForm] = Form.useForm()
   const [btnUpload, setBtnUpload] = useState(false)
-  const [key, setKey] = useState('1')
+  const [key, setKey] = useState("1")
   const [edit, setEdit] = useState(null)
-  const [discount, setDiscount] = useState('')
+  const [discount, setDiscount] = useState("")
   const [discountedPrice, setDiscountedPrice] = useState(0)
   const [originalPrice, setOriginalPrice] = useState(null)
-  const [previewLink, setPreviewLink] = useState('')
+  const [previewLink, setPreviewLink] = useState("")
   const [beforeUpload, setBeforeUpload] = useState(null)
   const [fileModal, setFileModal] = useState(false)
   const [spaceWarnigShow, setspaceWarnigShow] = useState(false)
-  const [text, setText] = React.useState('')
-  const [allWishlist, setAllWishlist] = React.useState('')
-  const currentdateTime = moment().format('DD-MM-YYYY hh:mm:ss A')
+  const [text, setText] = React.useState("")
+  const [allWishlist, setAllWishlist] = React.useState("")
+  const currentdateTime = moment().format("DD-MM-YYYY hh:mm:ss A")
 
   // redux
   const categoriesRedux = useSelector((state) => state.categories)
@@ -145,47 +145,68 @@ const Orders = () => {
   }
   const columns = [
     {
-      title: 'First Name',
-      dataIndex: 'first_name',
-      key: 'first_name',
+      title: "First Name",
+      dataIndex: "first_name",
+      key: "first_name",
     },
     {
-      title: 'Last Name',
-      dataIndex: 'last_name',
-      key: 'last_name',
+      title: "Last Name",
+      dataIndex: "last_name",
+      key: "last_name",
     },
     {
-      title: 'Order Date',
-      dataIndex: 'orderDate',
-      key: 'orderDate',
+      title: "Order Date",
+      dataIndex: "orderDate",
+      key: "orderDate",
     },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
     },
     {
-      title: 'Payable Amount',
-      dataIndex: 'payableAmount',
-      key: 'payableAmount',
-    },
-    {
-      title: 'Order Status',
-      dataIndex: 'orderStatus',
-      key: 'orderStatus',
+      title: "Payable Amount",
+      dataIndex: "payable_amount",
+      key: "payable_amount",
     },
     // {
-    //   title: 'Products',
-    //   dataIndex: 'products',
-    //   key: 'products',
-    //   render: (category) => (
-    //     <div style={colStyle} className="scroll">
-    //       <Tag className="rounded-pill my-1" color="cyan">
-    //         {categ?.find((cat) => cat.id === category)?.name}
-    //       </Tag>
-    //     </div>
-    //   ),
+    //   title: 'Order Status',
+    //   dataIndex: 'orderStatus',
+    //   key: 'orderStatus',
     // },
+    {
+      title: "Order Status",
+      dataIndex: "orderStatus",
+      key: "orderStatus",
+      render: (orderStatus = "", record) => (
+        <div className="scroll">
+          <Select
+            defaultValue={orderStatus.toLowerCase()}
+            style={{
+              width: 120,
+            }}
+            onChange={(value) => {
+              console.log(value, record)
+              handleUpdateOrder(value, record)
+            }}
+            options={[
+              {
+                value: "pending",
+                label: "Pending",
+              },
+              {
+                value: "shipped",
+                label: "Shipped",
+              },
+              {
+                value: "completed",
+                label: "Completed",
+              },
+            ]}
+          />
+        </div>
+      ),
+    },
     // {
     //   title: 'Brand',
     //   dataIndex: 'brand',
@@ -223,9 +244,9 @@ const Orders = () => {
     //   sorter: (a, b) => a.price - b.price,
     // },
     {
-      title: 'Actions',
-      dataIndex: 'id',
-      key: 'id',
+      title: "Actions",
+      dataIndex: "id",
+      key: "id",
       render: (id, item) => (
         <div className="d-flex">
           {/* <Tooltip title={`Edit`}>
@@ -271,15 +292,38 @@ const Orders = () => {
     getBrands()
   }, [])
 
+  const handleUpdateOrder = (orderStatus = "", orderData) => {
+    try {
+      setisLoading(true)
+      firebase
+        .firestore()
+        .collection("orders")
+        .doc(orderData.id)
+        .set({ ...orderData, orderStatus }, { merge: true })
+        .then(() => {
+          message.success('Order status updated')
+          getOrders()
+        })
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setisLoading(false)
+    }
+  }
+
   const getBrands = async () => {
-    let data = await getData('brands')
+    let data = await getData("brands")
     if (data) {
       setBrands(data)
     }
   }
 
   const getOrders = async () => {
-    let response = await firebase.firestore().collection('orders').orderBy('orderDate', 'desc').get()
+    let response = await firebase
+      .firestore()
+      .collection("orders")
+      .orderBy("orderDate", "desc")
+      .get()
     let data = response.docs.map((doc) => {
       return { ...doc.data(), id: doc.id }
     })
@@ -289,12 +333,12 @@ const Orders = () => {
   }
 
   const getColors = async () => {
-    let data = await getData('colors')
+    let data = await getData("colors")
     setColors(data)
   }
 
   const getClothTypes = async () => {
-    let data = await getData('clothTypes')
+    let data = await getData("clothTypes")
     setClothTypes(data)
   }
 
@@ -413,16 +457,16 @@ const Orders = () => {
     values.price = discountedPrice === 0 ? values.price : discountedPrice
     values.discountType = discountType
     values.createdDate = new Date()
-    values['is-new-product'] = true
+    values["is-new-product"] = true
     setBtnUpload(true)
-    const url = await multiImageUpload('products', values.image.fileList)
+    const url = await multiImageUpload("products", values.image.fileList)
     values.image = url
     values.admin = user // id of admin that posted the product
     console.log(values)
-    let response = await addDoc('orders', values)
+    let response = await addDoc("orders", values)
     setBtnUpload(false)
     if (response === true) {
-      message.success('Product Created Successfully!')
+      message.success("Product Created Successfully!")
       handleModalClose()
       getProducts()
       dispatch(fetchProducts())
@@ -434,7 +478,7 @@ const Orders = () => {
     setShow(false)
     form.resetFields()
     setBtnUpload(false)
-    setDiscount('')
+    setDiscount("")
     setDiscountedPrice(0)
     setOriginalPrice(null)
     setBeforeUpload(null)
@@ -442,7 +486,7 @@ const Orders = () => {
   // dummy request
   const dummyRequest = ({ file, onSuccess }) => {
     setTimeout(() => {
-      onSuccess('ok')
+      onSuccess("ok")
     }, 0)
   }
   // delete product
@@ -452,11 +496,11 @@ const Orders = () => {
     setisLoading(true)
     await firebase
       .firestore()
-      .collection('orders')
+      .collection("orders")
       .doc(id)
       .delete()
       .then(() => {
-        message.success('Order Deleted!')
+        message.success("Order Deleted!")
         getOrders()
         setisLoading(false)
       })
@@ -471,7 +515,7 @@ const Orders = () => {
     try {
       await firebase
         .firestore()
-        .collection('users')
+        .collection("users")
         .get()
         .then((docs) => {
           let arr = []
@@ -495,7 +539,7 @@ const Orders = () => {
     try {
       await firebase
         .firestore()
-        .collection('wishlists')
+        .collection("wishlists")
         .get()
         .then((docs) => {
           let arr = []
@@ -530,7 +574,7 @@ const Orders = () => {
       })
     })
     // const filterUser = allUsers.id.filter(temp)
-    console.log(newuser, 'email')
+    console.log(newuser, "email")
     newuser.map((user) => {
       const notification = {
         id: user.id,
@@ -543,33 +587,33 @@ const Orders = () => {
         clicked: true,
       }
 
-      saveData('notification', user.id, notification)
+      saveData("notification", user.id, notification)
       sendMailFunc({
         targetAdress: user,
       })
         .then((res) => {
-          console.log(res, 'Email Sent! res')
+          console.log(res, "Email Sent! res")
         })
         .catch((err) => {
-          console.log(err, 'Email Sent err!')
+          console.log(err, "Email Sent err!")
         })
 
-      console.log('Email Sent!')
+      console.log("Email Sent!")
     })
   }
-  const handleEditProduct = async (values) => {
+  const handleEditOrder = async (values) => {
     values.discountType = discountType
     // console.log(values.image);
     setBtnUpload(true)
     // return;
     if (values.image.fileList) {
       console.log(values.image)
-      const url = await multiImageUpload('products', values.image.fileList)
+      const url = await multiImageUpload("products", values.image.fileList)
       values.image = [...url, ...edit.image]
     } else {
       values.image = [...edit.image]
     }
-    console.log('values on eidt product', values.price, edit.price)
+    console.log("values on eidt product", values.price, edit.price)
     if (values.price !== edit.price) {
       sendProductsNotifictaion(values)
     }
@@ -581,11 +625,11 @@ const Orders = () => {
 
     await firebase
       .firestore()
-      .collection('products')
+      .collection("products")
       .doc(edit.id)
       .set(values, { merge: true })
       .then(() => {
-        message.success(edit.name + ' updated')
+        message.success(edit.name + " updated")
         handleBack()
         getProducts()
         dispatch(fetchProducts())
@@ -642,18 +686,18 @@ const Orders = () => {
     // })
     editForm.setFieldsValue({ ...item })
     setDiscountType(item.discountType)
-    setDiscount(item.discount ?? '')
+    setDiscount(item.discount ?? "")
     setOriginalPrice(item?.originalPrice ?? item.price)
     setDiscountedPrice(item.price)
     setEdit(item)
-    setKey('2')
+    setKey("2")
   }
   const handleBack = () => {
     setEdit(null)
-    setKey('1')
+    setKey("1")
     editForm.resetFields()
     setBtnUpload(false)
-    setDiscount('')
+    setDiscount("")
     setDiscountedPrice(0)
     setOriginalPrice(null)
   }
@@ -661,20 +705,20 @@ const Orders = () => {
   // handle discount
   const handleDiscount = (value) => {
     setDiscount(value)
-    if (!originalPrice || originalPrice === '') {
+    if (!originalPrice || originalPrice === "") {
       message.warn({
-        content: 'Please add Price first!',
-        key: 'price_add_first',
+        content: "Please add Price first!",
+        key: "price_add_first",
       })
-      setDiscount('')
+      setDiscount("")
       return
     }
     let price
     let disPrice
-    if (discountType === '£') {
+    if (discountType === "£") {
       disPrice = originalPrice - value
     }
-    if (discountType === '%') {
+    if (discountType === "%") {
       price = (originalPrice / 100) * value
       disPrice = originalPrice - price
     }
@@ -690,7 +734,7 @@ const Orders = () => {
     setBtnUpload(true)
     const status = await dispatch(addCategory(catSearch))
     if (status === 200) {
-      setCatSearch('')
+      setCatSearch("")
     }
     setBtnUpload(false)
   }
@@ -699,7 +743,7 @@ const Orders = () => {
     setBtnUpload(true)
     const status = await dispatch(addInterest(interSearch))
     if (status === 200) {
-      setInterSearch('')
+      setInterSearch("")
     }
     setBtnUpload(false)
   }
@@ -711,11 +755,11 @@ const Orders = () => {
       name: colorSearch,
       label: colorSearch.slice(0, 1).toUpperCase(),
     }
-    const response = await addDoc('colors', doc)
+    const response = await addDoc("colors", doc)
     if (response === true) {
       getColors()
     }
-    setColorSearch('')
+    setColorSearch("")
     setBtnUpload(false)
   }
 
@@ -726,16 +770,17 @@ const Orders = () => {
       name: clothTypeSearch,
       label: clothTypeSearch.slice(0, 1).toUpperCase(),
     }
-    const response = await addDoc('clothTypes', doc)
+    const response = await addDoc("clothTypes", doc)
     if (response === true) {
       getClothTypes()
     }
-    setClothTypeSearch('')
+    setClothTypeSearch("")
     setBtnUpload(false)
   }
 
   return (
     <>
+    <Spin spinning={isLoading}>
       <Container>
         <Tabs animated activeKey={key}>
           <TabPane key="1">
@@ -781,56 +826,56 @@ const Orders = () => {
                   scroll={{ x: true }}
                   loading={isLoading}
                   pagination={{
-                    position: ['bottomCenter'],
+                    position: ["bottomCenter"],
                     showSizeChanger: true,
                   }}
                   rowKey={(item) => item.id}
-                //   expandable={{
-                //     expandedRowRender: (item) => {
-                //       return (
-                //         <div>
-                //           <Row>
-                //             <Col>
-                //               <Space direction="vertical" wrap className='w-1002'>
-                //                 <strong>Order ID</strong>
-                //                 <p>{item?.id ?? ''}</p>
-                //                 {/* <strong>Description:</strong>
-                //                 <p style={{ margin: 0, textAlign: 'justify' }}>
-                //                   {item.description}
-                //                 </p> */}
-                //                 <div className="row">
-                //                   <div className="col-12">
-                //                     <strong>Order Date</strong>
-                //                     <p>{item?.orderDate}</p>
-                //                   </div>
-                //                 </div>
-                //                 <div className="row">
-                //                   <div className="col-6">
-                //                     <strong>First Name</strong>
-                //                     <p>{item?.first_name}</p>
-                //                   </div>
-                //                   <div className="col-6">
-                //                     <strong>Last Name</strong>
-                //                     <p>{item?.last_name}</p>
-                //                   </div>
-                //                 </div>
-                //                 <div className="row">
-                //                   {/* <div className="col-6">
-                //                     <strong>Price</strong>
-                //                     <p>{item?.price}</p>
-                //                   </div> */}
-                //                   <div className="col-6">
-                //                     <strong>Order Status</strong>
-                //                     <p>{item?.orderStatus}</p>
-                //                   </div>
-                //                 </div>
-                //               </Space>
-                //             </Col>
-                //           </Row>
-                //         </div>
-                //       )
-                //     },
-                //   }}
+                  //   expandable={{
+                  //     expandedRowRender: (item) => {
+                  //       return (
+                  //         <div>
+                  //           <Row>
+                  //             <Col>
+                  //               <Space direction="vertical" wrap className='w-1002'>
+                  //                 <strong>Order ID</strong>
+                  //                 <p>{item?.id ?? ''}</p>
+                  //                 {/* <strong>Description:</strong>
+                  //                 <p style={{ margin: 0, textAlign: 'justify' }}>
+                  //                   {item.description}
+                  //                 </p> */}
+                  //                 <div className="row">
+                  //                   <div className="col-12">
+                  //                     <strong>Order Date</strong>
+                  //                     <p>{item?.orderDate}</p>
+                  //                   </div>
+                  //                 </div>
+                  //                 <div className="row">
+                  //                   <div className="col-6">
+                  //                     <strong>First Name</strong>
+                  //                     <p>{item?.first_name}</p>
+                  //                   </div>
+                  //                   <div className="col-6">
+                  //                     <strong>Last Name</strong>
+                  //                     <p>{item?.last_name}</p>
+                  //                   </div>
+                  //                 </div>
+                  //                 <div className="row">
+                  //                   {/* <div className="col-6">
+                  //                     <strong>Price</strong>
+                  //                     <p>{item?.price}</p>
+                  //                   </div> */}
+                  //                   <div className="col-6">
+                  //                     <strong>Order Status</strong>
+                  //                     <p>{item?.orderStatus}</p>
+                  //                   </div>
+                  //                 </div>
+                  //               </Space>
+                  //             </Col>
+                  //           </Row>
+                  //         </div>
+                  //       )
+                  //     },
+                  //   }}
                 />
               </Col>
             </Row>
@@ -853,7 +898,7 @@ const Orders = () => {
                   size="large"
                   form={editForm}
                   layout="vertical"
-                  onFinish={handleEditProduct}
+                  onFinish={handleEditOrder}
                 >
                   <Row>
                     <Col md={6}>
@@ -861,7 +906,7 @@ const Orders = () => {
                         label="Name"
                         name="name"
                         rules={[
-                          { required: true, message: 'Please enter title!' },
+                          { required: true, message: "Please enter title!" },
                         ]}
                         className="fw-bold"
                       >
@@ -875,7 +920,7 @@ const Orders = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please enter description!',
+                            message: "Please enter description!",
                           },
                         ]}
                         className="fw-bold"
@@ -891,7 +936,7 @@ const Orders = () => {
                         label="Price"
                         className="fw-bold"
                         rules={[
-                          { required: true, message: 'Please enter price!' },
+                          { required: true, message: "Please enter price!" },
                         ]}
                       >
                         <Input
@@ -939,9 +984,9 @@ const Orders = () => {
                       </Item>
                       <span>
                         <strong>
-                          Discounted Price:{' '}
+                          Discounted Price:{" "}
                           <span className="text-primary">
-                            {' '}
+                            {" "}
                             £ {discountedPrice}
                           </span>
                         </strong>
@@ -956,7 +1001,7 @@ const Orders = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select category!',
+                            message: "Please select category!",
                           },
                         ]}
                         className="fw-bold"
@@ -976,13 +1021,13 @@ const Orders = () => {
                             <div
                               onClick={handleAddCategory}
                               title={`Add ${catSearch} to categories`}
-                              style={{ cursor: 'pointer', color: 'black' }}
+                              style={{ cursor: "pointer", color: "black" }}
                             >
                               <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                               <span className="me-2">Add</span>
                               <span
                                 className="px-2"
-                                style={{ backgroundColor: '#F0F2F5' }}
+                                style={{ backgroundColor: "#F0F2F5" }}
                               >
                                 {catSearch}
                               </span>
@@ -1006,7 +1051,7 @@ const Orders = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select product colors!',
+                            message: "Please select product colors!",
                           },
                         ]}
                         className="fw-bold"
@@ -1027,13 +1072,13 @@ const Orders = () => {
                             <div
                               onClick={handleAddColor}
                               title={`Add ${colorSearch} to Colors`}
-                              style={{ cursor: 'pointer', color: 'black' }}
+                              style={{ cursor: "pointer", color: "black" }}
                             >
                               <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                               <span className="me-2">Add</span>
                               <span
                                 className="px-2"
-                                style={{ backgroundColor: '#F0F2F5' }}
+                                style={{ backgroundColor: "#F0F2F5" }}
                               >
                                 {colorSearch}
                               </span>
@@ -1059,7 +1104,7 @@ const Orders = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select stitched!',
+                            message: "Please select stitched!",
                           },
                         ]}
                         className="fw-bold"
@@ -1068,8 +1113,8 @@ const Orders = () => {
                           placeholder="Select Stitched"
                           style={{ fontSize: 13, fontWeight: 300 }}
                         >
-                          <Option value={'yes'}>Yes</Option>
-                          <Option value={'no'}>No</Option>
+                          <Option value={"yes"}>Yes</Option>
+                          <Option value={"no"}>No</Option>
                         </Select>
                       </Item>
                     </Col>
@@ -1080,7 +1125,7 @@ const Orders = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select cloth type!',
+                            message: "Please select cloth type!",
                           },
                         ]}
                         className="fw-bold"
@@ -1095,13 +1140,13 @@ const Orders = () => {
                             <div
                               onClick={handleAddClothType}
                               title={`Add ${clothTypeSearch} to Cloth Types`}
-                              style={{ cursor: 'pointer', color: 'black' }}
+                              style={{ cursor: "pointer", color: "black" }}
                             >
                               <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                               <span className="me-2">Add</span>
                               <span
                                 className="px-2"
-                                style={{ backgroundColor: '#F0F2F5' }}
+                                style={{ backgroundColor: "#F0F2F5" }}
                               >
                                 {clothTypeSearch}
                               </span>
@@ -1125,7 +1170,7 @@ const Orders = () => {
                         label="Brand"
                         name="brand"
                         rules={[
-                          { required: true, message: 'Please select brand!' },
+                          { required: true, message: "Please select brand!" },
                         ]}
                         className="fw-bold"
                       >
@@ -1148,11 +1193,11 @@ const Orders = () => {
                     <Col md={6}>
                       <Item
                         label="New Product"
-                        name={'is-new-product'}
+                        name={"is-new-product"}
                         rules={[
                           {
                             required: true,
-                            message: 'Please select an option!',
+                            message: "Please select an option!",
                           },
                         ]}
                         className="fw-bold"
@@ -1175,7 +1220,7 @@ const Orders = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select cloth type!',
+                            message: "Please select cloth type!",
                           },
                         ]}
                         className="fw-bold"
@@ -1187,13 +1232,13 @@ const Orders = () => {
                           placeholder="Select Sizes"
                           style={{ fontSize: 13, fontWeight: 300 }}
                         >
-                          <Option value={'xs'}>XS</Option>
-                          <Option value={'s'}>S</Option>
-                          <Option value={'m'}>M</Option>
-                          <Option value={'l'}>L</Option>
-                          <Option value={'xl'}>XL</Option>
-                          <Option value={'xxl'}>XXL</Option>
-                          <Option value={'xxxl'}>XXXL</Option>
+                          <Option value={"xs"}>XS</Option>
+                          <Option value={"s"}>S</Option>
+                          <Option value={"m"}>M</Option>
+                          <Option value={"l"}>L</Option>
+                          <Option value={"xl"}>XL</Option>
+                          <Option value={"xxl"}>XXL</Option>
+                          <Option value={"xxxl"}>XXXL</Option>
                         </Select>
                       </Item>
                     </Col>
@@ -1210,7 +1255,7 @@ const Orders = () => {
                           accept="image/*"
                           customRequest={dummyRequest}
                           onRemove={() => {
-                            setFileName('')
+                            setFileName("")
                           }}
                           listType="picture"
                           multiple
@@ -1231,7 +1276,7 @@ const Orders = () => {
                               <div>
                                 <i
                                   className="fas fa-trash fs-5"
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   onClick={(e) => {
                                     let arr = [...productDetails?.image]
                                     arr?.splice(index, 1)
@@ -1243,7 +1288,7 @@ const Orders = () => {
                                 ></i>
                                 <Avatar
                                   size={80}
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   key={item}
                                   className="me-2"
                                   shape="square"
@@ -1296,7 +1341,7 @@ const Orders = () => {
                 <Item
                   label="Name"
                   name="name"
-                  rules={[{ required: true, message: 'Please enter title!' }]}
+                  rules={[{ required: true, message: "Please enter title!" }]}
                   className="fw-bold"
                 >
                   <Input type="text" />
@@ -1307,7 +1352,7 @@ const Orders = () => {
                   label="Description"
                   name="description"
                   rules={[
-                    { required: true, message: 'Please enter description!' },
+                    { required: true, message: "Please enter description!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1321,7 +1366,7 @@ const Orders = () => {
                   name="price"
                   label="Price"
                   className="fw-bold"
-                  rules={[{ required: true, message: 'Please enter price!' }]}
+                  rules={[{ required: true, message: "Please enter price!" }]}
                 >
                   <Input
                     onChange={(e) => setOriginalPrice(e.target.value)}
@@ -1368,7 +1413,7 @@ const Orders = () => {
                 </Item>
                 <span>
                   <strong>
-                    Discounted Price:{' '}
+                    Discounted Price:{" "}
                     <span className="text-primary"> £ {discountedPrice}</span>
                   </strong>
                 </span>
@@ -1380,7 +1425,7 @@ const Orders = () => {
                   label="Category"
                   name="category"
                   rules={[
-                    { required: true, message: 'Please select category!' },
+                    { required: true, message: "Please select category!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1399,13 +1444,13 @@ const Orders = () => {
                       <div
                         onClick={handleAddCategory}
                         title={`Add ${catSearch} to categories`}
-                        style={{ cursor: 'pointer', color: 'black' }}
+                        style={{ cursor: "pointer", color: "black" }}
                       >
                         <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                         <span className="me-2">Add</span>
                         <span
                           className="px-2"
-                          style={{ backgroundColor: '#F0F2F5' }}
+                          style={{ backgroundColor: "#F0F2F5" }}
                         >
                           {catSearch}
                         </span>
@@ -1427,7 +1472,7 @@ const Orders = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select product colors!',
+                      message: "Please select product colors!",
                     },
                   ]}
                   className="fw-bold"
@@ -1448,13 +1493,13 @@ const Orders = () => {
                       <div
                         onClick={handleAddColor}
                         title={`Add ${colorSearch} to Colors`}
-                        style={{ cursor: 'pointer', color: 'black' }}
+                        style={{ cursor: "pointer", color: "black" }}
                       >
                         <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                         <span className="me-2">Add</span>
                         <span
                           className="px-2"
-                          style={{ backgroundColor: '#F0F2F5' }}
+                          style={{ backgroundColor: "#F0F2F5" }}
                         >
                           {colorSearch}
                         </span>
@@ -1476,7 +1521,7 @@ const Orders = () => {
                   label="Stitched"
                   name="is_stitched"
                   rules={[
-                    { required: true, message: 'Please select stitched!' },
+                    { required: true, message: "Please select stitched!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1484,8 +1529,8 @@ const Orders = () => {
                     placeholder="Select Stitched"
                     style={{ fontSize: 13, fontWeight: 300 }}
                   >
-                    <Option value={'yes'}>Yes</Option>
-                    <Option value={'no'}>No</Option>
+                    <Option value={"yes"}>Yes</Option>
+                    <Option value={"no"}>No</Option>
                   </Select>
                 </Item>
               </Col>
@@ -1494,7 +1539,7 @@ const Orders = () => {
                   label="Cloth Types"
                   name="cloth_type"
                   rules={[
-                    { required: true, message: 'Please select cloth type!' },
+                    { required: true, message: "Please select cloth type!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1508,13 +1553,13 @@ const Orders = () => {
                       <div
                         onClick={handleAddClothType}
                         title={`Add ${clothTypeSearch} to Cloth Types`}
-                        style={{ cursor: 'pointer', color: 'black' }}
+                        style={{ cursor: "pointer", color: "black" }}
                       >
                         <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                         <span className="me-2">Add</span>
                         <span
                           className="px-2"
-                          style={{ backgroundColor: '#F0F2F5' }}
+                          style={{ backgroundColor: "#F0F2F5" }}
                         >
                           {clothTypeSearch}
                         </span>
@@ -1535,7 +1580,7 @@ const Orders = () => {
                 <Item
                   label="Brand"
                   name="brand"
-                  rules={[{ required: true, message: 'Please select brand!' }]}
+                  rules={[{ required: true, message: "Please select brand!" }]}
                   className="fw-bold"
                 >
                   <Select
@@ -1555,9 +1600,9 @@ const Orders = () => {
               <Col md={6}>
                 <Item
                   label="New Product"
-                  name={'is-new-product'}
+                  name={"is-new-product"}
                   rules={[
-                    { required: true, message: 'Please check this field!' },
+                    { required: true, message: "Please check this field!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1565,8 +1610,8 @@ const Orders = () => {
                     placeholder="Select Stitched"
                     style={{ fontSize: 13, fontWeight: 300 }}
                   >
-                    <Option value={'yes'}>Yes</Option>
-                    <Option value={'no'}>No</Option>
+                    <Option value={"yes"}>Yes</Option>
+                    <Option value={"no"}>No</Option>
                   </Select>
                 </Item>
               </Col>
@@ -1579,7 +1624,7 @@ const Orders = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select cloth type!',
+                      message: "Please select cloth type!",
                     },
                   ]}
                   className="fw-bold"
@@ -1591,13 +1636,13 @@ const Orders = () => {
                     placeholder="Select Sizes"
                     style={{ fontSize: 13, fontWeight: 300 }}
                   >
-                    <Option value={'xs'}>XS</Option>
-                    <Option value={'s'}>S</Option>
-                    <Option value={'m'}>M</Option>
-                    <Option value={'L'}>L</Option>
-                    <Option value={'XL'}>XL</Option>
-                    <Option value={'XXl'}>XXL</Option>
-                    <Option value={'XXXL'}>XXXL</Option>
+                    <Option value={"xs"}>XS</Option>
+                    <Option value={"s"}>S</Option>
+                    <Option value={"m"}>M</Option>
+                    <Option value={"L"}>L</Option>
+                    <Option value={"XL"}>XL</Option>
+                    <Option value={"XXl"}>XXL</Option>
+                    <Option value={"XXXL"}>XXXL</Option>
                   </Select>
                 </Item>
               </Col>
@@ -1605,14 +1650,14 @@ const Orders = () => {
                 <Item
                   label="Image"
                   name="image"
-                  rules={[{ required: true, message: 'Please select images!' }]}
+                  rules={[{ required: true, message: "Please select images!" }]}
                   className="fw-bold"
                 >
                   <Upload
                     accept="image/*"
                     customRequest={dummyRequest}
                     onRemove={() => {
-                      setFileName('')
+                      setFileName("")
                     }}
                     listType="picture"
                     multiple
@@ -1637,6 +1682,7 @@ const Orders = () => {
           </Form>
         </Modal>
       </Container>
+    </Spin>
     </>
   )
 }
