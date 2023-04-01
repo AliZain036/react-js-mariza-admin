@@ -252,7 +252,7 @@ const Categories = () => {
                 </Tag>
               </Col>
             </Row>
-            <Row className="mb-2 d-flex justify-content-end">
+            {/* <Row className="mb-2 d-flex justify-content-end">
               <Col md={4}>
                 <Select
                   allowClear
@@ -274,7 +274,7 @@ const Categories = () => {
                   ))}
                 </Select>
               </Col>
-            </Row>
+            </Row> */}
             <Row>
               <Col>
                 <Table
@@ -282,7 +282,7 @@ const Categories = () => {
                   dataSource={search}
                   columns={columns}
                   pagination={{
-                    position: ['bottomCenter'],
+                    position: ["bottomCenter"],
                   }}
                   scroll={{ x: true }}
                   loading={isLoading}
@@ -322,7 +322,7 @@ const Categories = () => {
                               rules={[
                                 {
                                   required: true,
-                                  message: 'Please enter title!',
+                                  message: "Please enter title!",
                                 },
                               ]}
                               className="fw-bold"
@@ -403,7 +403,7 @@ const Categories = () => {
               <Item
                 label="Name"
                 name="name"
-                rules={[{ required: true, message: 'Please enter title!' }]}
+                rules={[{ required: true, message: "Please enter title!" }]}
                 className="fw-bold"
               >
                 <Input type="text" />
@@ -414,7 +414,7 @@ const Categories = () => {
                 name="primary_image"
                 label="Primary Image"
                 tooltip="Upload single image"
-                rules={[{ message: 'Required field!', required: true }]}
+                rules={[{ message: "Required field!", required: true }]}
               >
                 <Dragger
                   multiple

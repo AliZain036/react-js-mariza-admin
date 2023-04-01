@@ -4,7 +4,7 @@ import {
   PoundCircleFilled,
   QuestionCircleOutlined,
   UploadOutlined,
-} from '@ant-design/icons'
+} from "@ant-design/icons"
 import {
   Avatar,
   BackTop,
@@ -26,13 +26,13 @@ import {
   Tag,
   Tooltip,
   Upload,
-} from 'antd'
-import { cloneDeep, debounce, filter, map, some } from 'lodash'
-import moment from 'moment'
-import React, { useEffect, useState } from 'react'
-import { Col, Container, Row } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import { firebase } from '../Firebase/config'
+} from "antd"
+import { cloneDeep, debounce, filter, map, some } from "lodash"
+import moment from "moment"
+import React, { useEffect, useState } from "react"
+import { Col, Container, Row } from "react-bootstrap"
+import { useDispatch, useSelector } from "react-redux"
+import { firebase } from "../Firebase/config"
 import {
   deleteStorageFiles,
   multiImageUpload,
@@ -41,38 +41,38 @@ import {
   saveData,
   addDoc,
   getData,
-} from '../Firebase/utils'
-import { addCategory, fetchCategories } from '../Redux/Actions/categories'
-import { addInterest, fetchInterests } from '../Redux/Actions/interest'
-import { fetchProducts, updateProduct } from '../Redux/Actions/products'
-import { backToTop } from './styles/styles'
+} from "../Firebase/utils"
+import { addCategory, fetchCategories } from "../Redux/Actions/categories"
+import { addInterest, fetchInterests } from "../Redux/Actions/interest"
+import { fetchProducts, updateProduct } from "../Redux/Actions/products"
+import { backToTop } from "./styles/styles"
 
 const { Item } = Form
 const { Option } = Select
 const { TabPane } = Tabs
 
 const colStyle = {
-  maxHeight: '200px',
-  maxWidth: '100%',
-  display: 'flex',
-  flexWrap: 'wrap',
-  overflowY: 'auto',
-  overflowX: 'hidden',
+  maxHeight: "200px",
+  maxWidth: "100%",
+  display: "flex",
+  flexWrap: "wrap",
+  overflowY: "auto",
+  overflowX: "hidden",
 }
 
 const Products = () => {
   // id of admin
-  const sendMailFunc = firebase.functions().httpsCallable('sendMail')
-  const [fileName, setFileName] = useState('')
+  const sendMailFunc = firebase.functions().httpsCallable("sendMail")
+  const [fileName, setFileName] = useState("")
   const dispatch = useDispatch()
-  const [discountType, setDiscountType] = useState('%')
-  const [catSearch, setCatSearch] = useState('')
+  const [discountType, setDiscountType] = useState("%")
+  const [catSearch, setCatSearch] = useState("")
   const [productDetails, setProductDetails] = useState(null)
-  const [colorSearch, setColorSearch] = useState('')
-  const [clothTypeSearch, setClothTypeSearch] = useState('')
+  const [colorSearch, setColorSearch] = useState("")
+  const [clothTypeSearch, setClothTypeSearch] = useState("")
   const [brands, setBrands] = useState([])
-  const [interSearch, setInterSearch] = useState('')
-  const [recSearch, setRecSearch] = useState('')
+  const [interSearch, setInterSearch] = useState("")
+  const [recSearch, setRecSearch] = useState("")
   const user = useSelector((state) => state.user.user)
   const [allProducts, setAllProducts] = useState(null)
   const [featuredCount, setfeaturedCount] = useState(0)
@@ -90,15 +90,15 @@ const Products = () => {
   const [form] = Form.useForm()
   const [editForm] = Form.useForm()
   const [btnUpload, setBtnUpload] = useState(false)
-  const [key, setKey] = useState('1')
+  const [key, setKey] = useState("1")
   const [edit, setEdit] = useState(null)
-  const [discount, setDiscount] = useState('')
+  const [discount, setDiscount] = useState("")
   const [discountedPrice, setDiscountedPrice] = useState(0)
   const [originalPrice, setOriginalPrice] = useState(null)
   const [beforeUpload, setBeforeUpload] = useState(null)
-  const [text, setText] = React.useState('')
-  const [allWishlist, setAllWishlist] = React.useState('')
-  const currentdateTime = moment().format('DD-MM-YYYY hh:mm:ss A')
+  const [text, setText] = React.useState("")
+  const [allWishlist, setAllWishlist] = React.useState("")
+  const currentdateTime = moment().format("DD-MM-YYYY hh:mm:ss A")
 
   // redux
   const categoriesRedux = useSelector((state) => state.categories)
@@ -109,14 +109,14 @@ const Products = () => {
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
       render: (category) => (
         <div style={colStyle} className="scroll">
           <Tag className="rounded-pill my-1" color="cyan">
@@ -125,25 +125,25 @@ const Products = () => {
         </div>
       ),
     },
+    // {
+    //   title: 'Colors',
+    //   dataIndex: 'colors',
+    //   key: 'colors',
+    //   render: (colorsArr) => (
+    //     <div style={colStyle} className="scroll">
+    //       {colorsArr &&
+    //         colorsArr?.map((item) => (
+    //           <Tag className="rounded-pill my-1" color="cyan">
+    //             {colors?.find((cat) => cat.id === item)?.name}
+    //           </Tag>
+    //         ))}
+    //     </div>
+    //   ),
+    // },
     {
-      title: 'Colors',
-      dataIndex: 'colors',
-      key: 'colors',
-      render: (colorsArr) => (
-        <div style={colStyle} className="scroll">
-          {colorsArr &&
-            colorsArr?.map((item) => (
-              <Tag className="rounded-pill my-1" color="cyan">
-                {colors?.find((cat) => cat.id === item)?.name}
-              </Tag>
-            ))}
-        </div>
-      ),
-    },
-    {
-      title: 'Brand',
-      dataIndex: 'brand',
-      key: 'brand',
+      title: "Brand",
+      dataIndex: "brand",
+      key: "brand",
       render: (brandId) => (
         <div style={colStyle} className="scroll">
           <Tag className="rounded-pill my-1" color="cyan">
@@ -153,9 +153,9 @@ const Products = () => {
       ),
     },
     {
-      title: 'Stock',
-      dataIndex: 'stock',
-      key: 'stock',
+      title: "Stock",
+      dataIndex: "stock",
+      key: "stock",
       // render: (brandId) => (
       //   <div style={colStyle} className="scroll">
       //     <Tag className="rounded-pill my-1" color="cyan">
@@ -165,9 +165,9 @@ const Products = () => {
       // ),
     },
     {
-      title: 'Cloth Type',
-      dataIndex: 'cloth_type',
-      key: 'cloth_type',
+      title: "Cloth Type",
+      dataIndex: "cloth_type",
+      key: "cloth_type",
       render: (clothTypeId) => (
         <div style={colStyle} className="scroll">
           <Tag className="rounded-pill my-1" color="cyan">
@@ -180,11 +180,11 @@ const Products = () => {
       ),
     },
     {
-      title: 'Price (£)',
-      dataIndex: 'price',
-      key: 'price',
+      title: "Price (£)",
+      dataIndex: "price",
+      key: "price",
       render: (price, item) => {
-        if (item.discount === '' || !item.discount || item.discount === '0') {
+        if (item.discount === "" || !item.discount || item.discount === "0") {
           return item.price
         } else {
           return (
@@ -204,9 +204,9 @@ const Products = () => {
       sorter: (a, b) => a.price - b.price,
     },
     {
-      title: 'Actions',
-      dataIndex: 'id',
-      key: 'id',
+      title: "Actions",
+      dataIndex: "id",
+      key: "id",
       render: (id, item) => (
         <div className="d-flex">
           <Tooltip title={`Edit ${item.name}`}>
@@ -261,19 +261,19 @@ const Products = () => {
   }, [])
 
   const getBrands = async () => {
-    let data = await getData('brands')
+    let data = await getData("brands")
     if (data) {
       setBrands(data)
     }
   }
 
   const getColors = async () => {
-    let data = await getData('colors')
+    let data = await getData("colors")
     setColors(data)
   }
 
   const getClothTypes = async () => {
-    let data = await getData('clothTypes')
+    let data = await getData("clothTypes")
     setClothTypes(data)
   }
 
@@ -305,6 +305,7 @@ const Products = () => {
 
   useEffect(() => {
     setAllProducts(productsRedux.products)
+    console.log(productsRedux.products)
     setSearch(productsRedux.products)
   }, [productsRedux])
 
@@ -340,27 +341,27 @@ const Products = () => {
   // add product in modal
   const handleAddProduct = async (values) => {
     if (discount) {
-      values.is_discounted = true
+      values["is_discounted"] = true
     } else {
-      values.is_discounted = false
+      values["is_discounted"] = false
     }
     values.discount = discount
     values.originalPrice = originalPrice
     values.price = discountedPrice === 0 ? values.price : discountedPrice
     values.discountType = discountType
     values.createdDate = new Date()
-    values['is-new-product'] = true
+    values["is-new-product"] = true
     setBtnUpload(true)
-    const url = await multiImageUpload('products', values.image.fileList)
+    const url = await multiImageUpload("products", values.image.fileList)
     values.image = url
     values.stock = Number(values?.stock)
     values.admin = user // id of admin that posted the product
     let sizes = values?.sizes?.map((size) => size?.toLowerCase())
     values.sizes = sizes
-    let response = await addDoc('products', values)
+    let response = await addDoc("products", values)
     setBtnUpload(false)
     if (response === true) {
-      message.success('Product Created Successfully!')
+      message.success("Product Created Successfully!")
       handleModalClose()
       getProducts()
       dispatch(fetchProducts())
@@ -372,7 +373,7 @@ const Products = () => {
     setShow(false)
     form.resetFields()
     setBtnUpload(false)
-    setDiscount('')
+    setDiscount("")
     setDiscountedPrice(0)
     setOriginalPrice(null)
     setBeforeUpload(null)
@@ -380,7 +381,7 @@ const Products = () => {
   // dummy request
   const dummyRequest = ({ file, onSuccess }) => {
     setTimeout(() => {
-      onSuccess('ok')
+      onSuccess("ok")
     }, 0)
   }
   // delete product
@@ -390,11 +391,11 @@ const Products = () => {
     setisLoading(true)
     await firebase
       .firestore()
-      .collection('products')
+      .collection("products")
       .doc(id)
       .delete()
       .then(() => {
-        message.success('Product Deleted!')
+        message.success("Product Deleted!")
         deleteStorageFiles(prod.image)
         getProducts()
         dispatch(fetchProducts())
@@ -411,7 +412,7 @@ const Products = () => {
     try {
       await firebase
         .firestore()
-        .collection('users')
+        .collection("users")
         .get()
         .then((docs) => {
           let arr = []
@@ -435,7 +436,7 @@ const Products = () => {
     try {
       await firebase
         .firestore()
-        .collection('wishlists')
+        .collection("wishlists")
         .get()
         .then((docs) => {
           let arr = []
@@ -470,7 +471,7 @@ const Products = () => {
       })
     })
     // const filterUser = allUsers.id.filter(temp)
-    console.log(newuser, 'email')
+    console.log(newuser, "email")
     newuser.map((user) => {
       const notification = {
         id: user.id,
@@ -483,97 +484,120 @@ const Products = () => {
         clicked: true,
       }
 
-      saveData('notification', user.id, notification)
+      saveData("notification", user.id, notification)
       sendMailFunc({
         targetAdress: user,
       })
         .then((res) => {
-          console.log(res, 'Email Sent! res')
+          console.log(res, "Email Sent! res")
         })
         .catch((err) => {
-          console.log(err, 'Email Sent err!')
+          console.log(err, "Email Sent err!")
         })
 
-      console.log('Email Sent!')
+      console.log("Email Sent!")
     })
   }
   const handleEditProduct = async (values) => {
+    if (+editForm.getFieldValue("originalPrice") < discountedPrice) {
+      message.error({
+        content: "Discount price cannot be less than original price!",
+      })
+      return
+    }
+    if (discountType === "£") {
+      if (+discount > +editForm.getFieldValue("originalPrice")) {
+        message.error("Price cannot be less than discount price")
+        return
+      }
+    }
     values.discountType = discountType
     // console.log(values.image);
     setBtnUpload(true)
     // return;
     if (values.image.fileList) {
       console.log(values.image)
-      const url = await multiImageUpload('products', values.image.fileList)
+      const url = await multiImageUpload("products", values.image.fileList)
       values.image = [...url, ...edit.image]
     } else {
       values.image = [...edit.image]
     }
-    console.log('values on eidt product', values.price, edit.price)
+    console.log("values on eidt product", values.price, edit.price)
     if (values.price !== edit.price) {
       sendProductsNotifictaion(values)
     }
-
-    values.discount = discount
-    values.originalPrice = originalPrice
+    // values.discount = discountedPrice
+    // values.originalPrice = originalPrice
     values.price = discountedPrice === 0 ? values.price : discountedPrice
     values.customLink = text
     let sizes = values?.sizes?.map((size) => size?.toLowerCase())
     values.sizes = sizes
     values.stock = Number(values.stock)
+    if (!editForm.getFieldValue("discount")) {
+      values["is_discounted"] = false
+    } else {
+      values["is_discounted"] = true
+    }
 
     await firebase
       .firestore()
-      .collection('products')
+      .collection("products")
       .doc(edit.id)
       .set(values, { merge: true })
       .then(() => {
-        message.success(edit.name + ' updated')
+        message.success(edit.name + " updated")
         handleBack()
         getProducts()
         dispatch(fetchProducts())
-      }) 
+      })
     setBtnUpload(false)
   }
 
   const handleEdit = (item) => {
+    console.log({ item })
     editForm.setFieldsValue({ ...item })
     setDiscountType(item.discountType)
-    setDiscount(item.discount ?? '')
+    setDiscount(item.discount ?? "")
     setOriginalPrice(item?.originalPrice ?? item.price)
     setDiscountedPrice(item.price)
     setEdit(item)
-    setKey('2')
+    setKey("2")
   }
   const handleBack = () => {
     setEdit(null)
-    setKey('1')
+    setKey("1")
     editForm.resetFields()
     setBtnUpload(false)
-    setDiscount('')
+    setDiscount("")
     setDiscountedPrice(0)
     setOriginalPrice(null)
   }
 
   // handle discount
-  const handleDiscount = (value) => {
+  const handleDiscount = (value, locDiscType) => {
     setDiscount(value)
-    if (!originalPrice || originalPrice === '') {
+    if (!locDiscType) {
+      locDiscType = discountType
+    }
+    value = editForm.getFieldValue("discount")
+    const locOriginialPrice = editForm.getFieldValue("originalPrice")
+    if (!locOriginialPrice || locOriginialPrice === "") {
       message.warn({
-        content: 'Please add Price first!',
-        key: 'price_add_first',
+        content: "Please add Price first!",
+        key: "price_add_first",
       })
-      setDiscount('')
+      setDiscount("")
       return
     }
+    // setDiscountType(locDiscType)
     let price
     let disPrice
-    if (discountType === '£') {
-      disPrice = originalPrice - value
+    if (locDiscType === "£") {
+      disPrice = locOriginialPrice - value
     }
-    if (discountType === '%') {
-      price = (originalPrice / 100) * value
-      disPrice = originalPrice - price
+    if (locDiscType === "%") {
+      price = (locOriginialPrice / 100) * value
+      disPrice = locOriginialPrice - price
     }
     disPrice = disPrice.toFixed(2)
     setDiscountedPrice(disPrice)
@@ -587,7 +611,7 @@ const Products = () => {
     setBtnUpload(true)
     const status = await dispatch(addCategory(catSearch))
     if (status === 200) {
-      setCatSearch('')
+      setCatSearch("")
     }
     setBtnUpload(false)
   }
@@ -596,7 +620,7 @@ const Products = () => {
     setBtnUpload(true)
     const status = await dispatch(addInterest(interSearch))
     if (status === 200) {
-      setInterSearch('')
+      setInterSearch("")
     }
     setBtnUpload(false)
   }
@@ -608,11 +632,11 @@ const Products = () => {
       name: colorSearch,
       label: colorSearch.slice(0, 1).toUpperCase(),
     }
-    const response = await addDoc('colors', doc)
+    const response = await addDoc("colors", doc)
     if (response === true) {
       getColors()
     }
-    setColorSearch('')
+    setColorSearch("")
     setBtnUpload(false)
   }
 
@@ -623,11 +647,11 @@ const Products = () => {
       name: clothTypeSearch,
       label: clothTypeSearch.slice(0, 1).toUpperCase(),
     }
-    const response = await addDoc('clothTypes', doc)
+    const response = await addDoc("clothTypes", doc)
     if (response === true) {
       getClothTypes()
     }
-    setClothTypeSearch('')
+    setClothTypeSearch("")
     setBtnUpload(false)
   }
 
@@ -660,7 +684,7 @@ const Products = () => {
                 </Tag>
               </Col>
             </Row>
-            <Row className="mb-2 d-flex justify-content-end mb-3">
+            {/* <Row className="mb-2 d-flex justify-content-end mb-3">
               <Col md={4} className="d-flex">
                 <Input
                   type="text"
@@ -668,7 +692,7 @@ const Products = () => {
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </Col>
-            </Row>
+            </Row> */}
             <Row>
               <Col>
                 <Table
@@ -678,7 +702,7 @@ const Products = () => {
                   scroll={{ x: true }}
                   loading={isLoading}
                   pagination={{
-                    position: ['bottomCenter'],
+                    position: ["bottomCenter"],
                     showSizeChanger: true,
                   }}
                   rowKey={(item) => item.id}
@@ -690,9 +714,9 @@ const Products = () => {
                             <Col>
                               <Space direction="vertical" wrap>
                                 <strong>Product ID</strong>
-                                <p>{item?.id ?? ''}</p>
+                                <p>{item?.id ?? ""}</p>
                                 <strong>Description:</strong>
-                                <p style={{ margin: 0, textAlign: 'justify' }}>
+                                <p style={{ margin: 0, textAlign: "justify" }}>
                                   {item.description}
                                 </p>
                               </Space>
@@ -732,7 +756,7 @@ const Products = () => {
                         label="Name"
                         name="name"
                         rules={[
-                          { required: true, message: 'Please enter title!' },
+                          { required: true, message: "Please enter title!" },
                         ]}
                         className="fw-bold"
                       >
@@ -746,7 +770,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please enter description!',
+                            message: "Please enter description!",
                           },
                         ]}
                         className="fw-bold"
@@ -758,15 +782,17 @@ const Products = () => {
                   <Row>
                     <Col md={4}>
                       <Item
-                        name="price"
-                        label="Price"
+                        name="originalPrice"
+                        label="Original Price"
                         className="fw-bold"
                         rules={[
-                          { required: true, message: 'Please enter price!' },
+                          { required: true, message: "Please enter price!" },
                         ]}
                       >
                         <Input
-                          onChange={(e) => setOriginalPrice(e.target.value)}
+                          onChange={(e) => {
+                            handleDiscount(discount)
+                          }}
                           prefix={<PoundCircleFilled />}
                           type="number"
                         />
@@ -781,8 +807,24 @@ const Products = () => {
                               <div>
                                 <Radio.Group
                                   onChange={(e) => {
-                                    setDiscountType(e.target.value)
-                                    handleDiscount(discount)
+                                    const locOriginalPrice =
+                                      editForm.getFieldValue("originalPrice")
+                                    if (locOriginalPrice) {
+                                      setDiscountType(e.target.value)
+                                      handleDiscount(discount, e.target.value)
+                                    } else {
+                                      if (
+                                        !locOriginalPrice ||
+                                        locOriginalPrice === ""
+                                      ) {
+                                        message.warn({
+                                          content: "Please add Price first!",
+                                          key: "price_add_first",
+                                        })
+                                        setDiscount("")
+                                        return
+                                      }
+                                    }
                                   }}
                                   value={discountType}
                                 >
@@ -797,22 +839,31 @@ const Products = () => {
                             </div>
                           </>
                         }
+                        name="discount"
                         className="fw-bold"
                       >
                         <Input
                           name="discount"
-                          onChange={(e) => handleDiscount(e.target.value)}
+                          onChange={(e) => {
+                            handleDiscount(e.target.value)
+                          }}
                           min={0}
-                          value={discount}
+                          max={
+                            discountType === "%"
+                              ? 70
+                              : +editForm.getFieldValue("originalPrice")
+                          }
+                          // value={discount}
+                          disabled={!editForm.getFieldValue("originalPrice")}
                           prefix={discountType}
                           type="number"
                         />
                       </Item>
                       <span>
                         <strong>
-                          Discounted Price:{' '}
+                          Discounted Price:{" "}
                           <span className="text-primary">
-                            {' '}
+                            {" "}
                             £ {discountedPrice}
                           </span>
                         </strong>
@@ -824,11 +875,11 @@ const Products = () => {
                         label="Stock"
                         className="fw-bold"
                         rules={[
-                          { required: true, message: 'Please enter stock!' },
+                          { required: true, message: "Please enter stock!" },
                         ]}
                       >
                         <Input
-                          onChange={(e) => setOriginalPrice(e.target.value)}
+                          // onChange={(e) => setOriginalPrice(e.target.value)}
                           prefix={<PoundCircleFilled />}
                           type="number"
                         />
@@ -843,7 +894,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select category!',
+                            message: "Please select category!",
                           },
                         ]}
                         className="fw-bold"
@@ -863,13 +914,13 @@ const Products = () => {
                             <div
                               onClick={handleAddCategory}
                               title={`Add ${catSearch} to categories`}
-                              style={{ cursor: 'pointer', color: 'black' }}
+                              style={{ cursor: "pointer", color: "black" }}
                             >
                               <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                               <span className="me-2">Add</span>
                               <span
                                 className="px-2"
-                                style={{ backgroundColor: '#F0F2F5' }}
+                                style={{ backgroundColor: "#F0F2F5" }}
                               >
                                 {catSearch}
                               </span>
@@ -893,7 +944,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select product colors!',
+                            message: "Please select product colors!",
                           },
                         ]}
                         className="fw-bold"
@@ -914,13 +965,13 @@ const Products = () => {
                             <div
                               onClick={handleAddColor}
                               title={`Add ${colorSearch} to Colors`}
-                              style={{ cursor: 'pointer', color: 'black' }}
+                              style={{ cursor: "pointer", color: "black" }}
                             >
                               <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                               <span className="me-2">Add</span>
                               <span
                                 className="px-2"
-                                style={{ backgroundColor: '#F0F2F5' }}
+                                style={{ backgroundColor: "#F0F2F5" }}
                               >
                                 {colorSearch}
                               </span>
@@ -946,7 +997,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select stitched!',
+                            message: "Please select stitched!",
                           },
                         ]}
                         className="fw-bold"
@@ -955,8 +1006,8 @@ const Products = () => {
                           placeholder="Select Stitched"
                           style={{ fontSize: 13, fontWeight: 300 }}
                         >
-                          <Option value={'yes'}>Yes</Option>
-                          <Option value={'no'}>No</Option>
+                          <Option value={"yes"}>Yes</Option>
+                          <Option value={"no"}>No</Option>
                         </Select>
                       </Item>
                     </Col>
@@ -967,7 +1018,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select cloth type!',
+                            message: "Please select cloth type!",
                           },
                         ]}
                         className="fw-bold"
@@ -982,13 +1033,13 @@ const Products = () => {
                             <div
                               onClick={handleAddClothType}
                               title={`Add ${clothTypeSearch} to Cloth Types`}
-                              style={{ cursor: 'pointer', color: 'black' }}
+                              style={{ cursor: "pointer", color: "black" }}
                             >
                               <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                               <span className="me-2">Add</span>
                               <span
                                 className="px-2"
-                                style={{ backgroundColor: '#F0F2F5' }}
+                                style={{ backgroundColor: "#F0F2F5" }}
                               >
                                 {clothTypeSearch}
                               </span>
@@ -1012,7 +1063,7 @@ const Products = () => {
                         label="Brand"
                         name="brand"
                         rules={[
-                          { required: true, message: 'Please select brand!' },
+                          { required: true, message: "Please select brand!" },
                         ]}
                         className="fw-bold"
                       >
@@ -1035,11 +1086,11 @@ const Products = () => {
                     <Col md={6}>
                       <Item
                         label="New Product"
-                        name={'is-new-product'}
+                        name={"is-new-product"}
                         rules={[
                           {
                             required: true,
-                            message: 'Please select an option!',
+                            message: "Please select an option!",
                           },
                         ]}
                         className="fw-bold"
@@ -1062,7 +1113,7 @@ const Products = () => {
                         rules={[
                           {
                             required: true,
-                            message: 'Please select size!',
+                            message: "Please select size!",
                           },
                         ]}
                         className="fw-bold"
@@ -1074,13 +1125,13 @@ const Products = () => {
                           placeholder="Select Sizes"
                           style={{ fontSize: 13, fontWeight: 300 }}
                         >
-                          <Option value={'xs'}>XS</Option>
-                          <Option value={'s'}>S</Option>
-                          <Option value={'m'}>M</Option>
-                          <Option value={'l'}>L</Option>
-                          <Option value={'xl'}>XL</Option>
-                          <Option value={'xxl'}>XXL</Option>
-                          <Option value={'xxxl'}>XXXL</Option>
+                          <Option value={"xs"}>XS</Option>
+                          <Option value={"s"}>S</Option>
+                          <Option value={"m"}>M</Option>
+                          <Option value={"l"}>L</Option>
+                          <Option value={"xl"}>XL</Option>
+                          <Option value={"xxl"}>XXL</Option>
+                          <Option value={"xxxl"}>XXXL</Option>
                         </Select>
                       </Item>
                     </Col>
@@ -1097,7 +1148,7 @@ const Products = () => {
                           accept="image/*"
                           customRequest={dummyRequest}
                           onRemove={() => {
-                            setFileName('')
+                            setFileName("")
                           }}
                           listType="picture"
                           multiple
@@ -1118,7 +1169,7 @@ const Products = () => {
                               <div>
                                 <i
                                   className="fas fa-trash fs-5"
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   onClick={(e) => {
                                     let arr = [...productDetails?.image]
                                     arr?.splice(index, 1)
@@ -1130,7 +1181,7 @@ const Products = () => {
                                 ></i>
                                 <Avatar
                                   size={80}
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   key={item}
                                   className="me-2"
                                   shape="square"
@@ -1183,7 +1234,7 @@ const Products = () => {
                 <Item
                   label="Name"
                   name="name"
-                  rules={[{ required: true, message: 'Please enter title!' }]}
+                  rules={[{ required: true, message: "Please enter title!" }]}
                   className="fw-bold"
                 >
                   <Input type="text" />
@@ -1194,7 +1245,7 @@ const Products = () => {
                   label="Description"
                   name="description"
                   rules={[
-                    { required: true, message: 'Please enter description!' },
+                    { required: true, message: "Please enter description!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1210,7 +1261,7 @@ const Products = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please enter available stock!',
+                      message: "Please enter available stock!",
                     },
                   ]}
                   className="fw-bold"
@@ -1228,7 +1279,7 @@ const Products = () => {
                   name="price"
                   label="Price"
                   className="fw-bold"
-                  rules={[{ required: true, message: 'Please enter price!' }]}
+                  rules={[{ required: true, message: "Please enter price!" }]}
                 >
                   <Input
                     onChange={(e) => setOriginalPrice(e.target.value)}
@@ -1269,7 +1320,7 @@ const Products = () => {
                     onChange={(e) => handleDiscount(e.target.value)}
                     min={0}
                     max={
-                      discountType === '%' ? 90 : form.getFieldValue('price')
+                      discountType === "%" ? 90 : form.getFieldValue("price")
                     }
                     value={discount}
                     prefix={discountType}
@@ -1278,9 +1329,9 @@ const Products = () => {
                 </Item>
                 <span>
                   <strong>
-                    Discounted Price:{' '}
+                    Discounted Price:{" "}
                     <span className="text-primary">
-                      {' '}
+                      {" "}
                       {discountType} {discountedPrice}
                     </span>
                   </strong>
@@ -1293,7 +1344,7 @@ const Products = () => {
                   label="Category"
                   name="category"
                   rules={[
-                    { required: true, message: 'Please select category!' },
+                    { required: true, message: "Please select category!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1312,13 +1363,13 @@ const Products = () => {
                       <div
                         onClick={handleAddCategory}
                         title={`Add ${catSearch} to categories`}
-                        style={{ cursor: 'pointer', color: 'black' }}
+                        style={{ cursor: "pointer", color: "black" }}
                       >
                         <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                         <span className="me-2">Add</span>
                         <span
                           className="px-2"
-                          style={{ backgroundColor: '#F0F2F5' }}
+                          style={{ backgroundColor: "#F0F2F5" }}
                         >
                           {catSearch}
                         </span>
@@ -1340,7 +1391,7 @@ const Products = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select product colors!',
+                      message: "Please select product colors!",
                     },
                   ]}
                   className="fw-bold"
@@ -1361,13 +1412,13 @@ const Products = () => {
                       <div
                         onClick={handleAddColor}
                         title={`Add ${colorSearch} to Colors`}
-                        style={{ cursor: 'pointer', color: 'black' }}
+                        style={{ cursor: "pointer", color: "black" }}
                       >
                         <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                         <span className="me-2">Add</span>
                         <span
                           className="px-2"
-                          style={{ backgroundColor: '#F0F2F5' }}
+                          style={{ backgroundColor: "#F0F2F5" }}
                         >
                           {colorSearch}
                         </span>
@@ -1389,7 +1440,7 @@ const Products = () => {
                   label="Stitched"
                   name="is_stitched"
                   rules={[
-                    { required: true, message: 'Please select stitched!' },
+                    { required: true, message: "Please select stitched!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1397,8 +1448,8 @@ const Products = () => {
                     placeholder="Select Stitched"
                     style={{ fontSize: 13, fontWeight: 300 }}
                   >
-                    <Option value={'yes'}>Yes</Option>
-                    <Option value={'no'}>No</Option>
+                    <Option value={"yes"}>Yes</Option>
+                    <Option value={"no"}>No</Option>
                   </Select>
                 </Item>
               </Col>
@@ -1407,7 +1458,7 @@ const Products = () => {
                   label="Cloth Types"
                   name="cloth_type"
                   rules={[
-                    { required: true, message: 'Please select cloth type!' },
+                    { required: true, message: "Please select cloth type!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1421,13 +1472,13 @@ const Products = () => {
                       <div
                         onClick={handleAddClothType}
                         title={`Add ${clothTypeSearch} to Cloth Types`}
-                        style={{ cursor: 'pointer', color: 'black' }}
+                        style={{ cursor: "pointer", color: "black" }}
                       >
                         <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
                         <span className="me-2">Add</span>
                         <span
                           className="px-2"
-                          style={{ backgroundColor: '#F0F2F5' }}
+                          style={{ backgroundColor: "#F0F2F5" }}
                         >
                           {clothTypeSearch}
                         </span>
@@ -1448,7 +1499,7 @@ const Products = () => {
                 <Item
                   label="Brand"
                   name="brand"
-                  rules={[{ required: true, message: 'Please select brand!' }]}
+                  rules={[{ required: true, message: "Please select brand!" }]}
                   className="fw-bold"
                 >
                   <Select
@@ -1468,9 +1519,9 @@ const Products = () => {
               <Col md={6}>
                 <Item
                   label="New Product"
-                  name={'is-new-product'}
+                  name={"is-new-product"}
                   rules={[
-                    { required: true, message: 'Please check this field!' },
+                    { required: true, message: "Please check this field!" },
                   ]}
                   className="fw-bold"
                 >
@@ -1478,8 +1529,8 @@ const Products = () => {
                     placeholder="Select Stitched"
                     style={{ fontSize: 13, fontWeight: 300 }}
                   >
-                    <Option value={'yes'}>Yes</Option>
-                    <Option value={'no'}>No</Option>
+                    <Option value={"yes"}>Yes</Option>
+                    <Option value={"no"}>No</Option>
                   </Select>
                 </Item>
               </Col>
@@ -1492,7 +1543,7 @@ const Products = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select cloth type!',
+                      message: "Please select cloth type!",
                     },
                   ]}
                   className="fw-bold"
@@ -1504,13 +1555,13 @@ const Products = () => {
                     placeholder="Select Sizes"
                     style={{ fontSize: 13, fontWeight: 300 }}
                   >
-                    <Option value={'xs'}>XS</Option>
-                    <Option value={'s'}>S</Option>
-                    <Option value={'m'}>M</Option>
-                    <Option value={'L'}>L</Option>
-                    <Option value={'XL'}>XL</Option>
-                    <Option value={'XXl'}>XXL</Option>
-                    <Option value={'XXXL'}>XXXL</Option>
+                    <Option value={"xs"}>XS</Option>
+                    <Option value={"s"}>S</Option>
+                    <Option value={"m"}>M</Option>
+                    <Option value={"L"}>L</Option>
+                    <Option value={"XL"}>XL</Option>
+                    <Option value={"XXl"}>XXL</Option>
+                    <Option value={"XXXL"}>XXXL</Option>
                   </Select>
                 </Item>
               </Col>
@@ -1518,14 +1569,14 @@ const Products = () => {
                 <Item
                   label="Image"
                   name="image"
-                  rules={[{ required: true, message: 'Please select images!' }]}
+                  rules={[{ required: true, message: "Please select images!" }]}
                   className="fw-bold"
                 >
                   <Upload
                     accept="image/*"
                     customRequest={dummyRequest}
                     onRemove={() => {
-                      setFileName('')
+                      setFileName("")
                     }}
                     listType="picture"
                     multiple

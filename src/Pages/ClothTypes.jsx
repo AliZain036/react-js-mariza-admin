@@ -193,29 +193,29 @@ const ClothTypes = () => {
                 </Tag>
               </Col>
             </Row> */}
-            <Row className="mb-2 d-flex justify-content-end">
-              <Col md={4}>
-                <Select
-                  allowClear
-                  showSearch
-                  style={{ width: '100%' }}
-                  placeholder="Search cloth types"
-                  // onChange={handleSearch}
-                  onClear={handleClear}
-                  onSelect={handleSearch}
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  {clothTypes.map((item) => (
-                    <Option value={item.id}>{item.name}</Option>
-                  ))}
-                </Select>
-              </Col>
-            </Row>
+            {/* <Row className="mb-2 d-flex justify-content-end">
+                <Col md={4}>
+                  <Select
+                    allowClear
+                    showSearch
+                    style={{ width: '100%' }}
+                    placeholder="Search cloth types"
+                    // onChange={handleSearch}
+                    onClear={handleClear}
+                    onSelect={handleSearch}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {clothTypes.map((item) => (
+                      <Option value={item.id}>{item.name}</Option>
+                    ))}
+                  </Select>
+                </Col>
+              </Row> */}
             <Row>
               <Col>
                 <Table
@@ -223,7 +223,7 @@ const ClothTypes = () => {
                   dataSource={clothTypes}
                   columns={columns}
                   pagination={{
-                    position: ['bottomCenter'],
+                    position: ["bottomCenter"],
                   }}
                   scroll={{ x: true }}
                   loading={isLoading}
@@ -263,7 +263,7 @@ const ClothTypes = () => {
                               rules={[
                                 {
                                   required: true,
-                                  message: 'Please enter title!',
+                                  message: "Please enter title!",
                                 },
                               ]}
                               className="fw-bold"
@@ -295,13 +295,13 @@ const ClothTypes = () => {
       </Container>
       <Modal
         title={`${
-          editForm.getFieldValue('name') ? 'Edit' : 'Add'
+          editForm.getFieldValue("name") ? "Edit" : "Add"
         } New Cloth Type`}
         visible={show}
         footer={false}
         onCancel={handleModalClose}
       >
-        {editForm.getFieldValue('name') ? (
+        {editForm.getFieldValue("name") ? (
           <Form
             layout="vertical"
             onFinish={handleEditCategory}
@@ -316,7 +316,7 @@ const ClothTypes = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please enter title!',
+                      message: "Please enter title!",
                     },
                   ]}
                   className="fw-bold"
@@ -350,7 +350,7 @@ const ClothTypes = () => {
                 <Item
                   label="Name"
                   name="name"
-                  rules={[{ required: true, message: 'Please enter title!' }]}
+                  rules={[{ required: true, message: "Please enter title!" }]}
                   className="fw-bold"
                 >
                   <Input type="text" />

@@ -158,6 +158,11 @@ const Orders = () => {
       title: "Order Date",
       dataIndex: "orderDate",
       key: "orderDate",
+      render: (orderDate) => (
+        <div>
+          <p>{moment(orderDate).format("YYYY-MM-DD hh:mm A")}</p>
+        </div>
+      ),
     },
     {
       title: "Address",
@@ -165,9 +170,14 @@ const Orders = () => {
       key: "address",
     },
     {
-      title: "Payable Amount",
-      dataIndex: "payable_amount",
-      key: "payable_amount",
+      title: "Total Amount",
+      dataIndex: "session",
+      key: "session",
+      render: (session = {}, record) => (
+        <div className="scroll">
+          <p>{session.amount_total / 100}</p>
+        </div>
+      ),
     },
     // {
     //   title: 'Order Status',
@@ -301,11 +311,11 @@ const Orders = () => {
         .doc(orderData.id)
         .set({ ...orderData, orderStatus }, { merge: true })
         .then(() => {
-          message.success('Order status updated')
+          message.success("Order status updated")
           getOrders()
         })
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
       setisLoading(false)
     }
@@ -780,11 +790,11 @@ const Orders = () => {
 
   return (
     <>
-    <Spin spinning={isLoading}>
-      <Container>
-        <Tabs animated activeKey={key}>
-          <TabPane key="1">
-            {/* <Row>
+      <Spin spinning={isLoading}>
+        <Container>
+          <Tabs animated activeKey={key}>
+            <TabPane key="1">
+              {/* <Row>
               <Col>
                 <Button
                   type="primary"
@@ -798,17 +808,17 @@ const Orders = () => {
                 </Button>
               </Col>
             </Row> */}
-            <Row className="my-2">
-              <Col className="d-flex justify-content-center">
-                <Tag
-                  className="my-2 rounded-pill font18 px-3 py-2"
-                  color="blue"
-                >
-                  Total Orders: {orders ? orders.length : 0}
-                </Tag>
-              </Col>
-            </Row>
-            {/* <Row className="mb-2 d-flex justify-content-end mb-3">
+              <Row className="my-2">
+                <Col className="d-flex justify-content-center">
+                  <Tag
+                    className="my-2 rounded-pill font18 px-3 py-2"
+                    color="blue"
+                  >
+                    Total Orders: {orders ? orders.length : 0}
+                  </Tag>
+                </Col>
+              </Row>
+              {/* <Row className="mb-2 d-flex justify-content-end mb-3">
               <Col md={4} className="d-flex">
                 <Input
                   type="text"
@@ -817,872 +827,882 @@ const Orders = () => {
                 />
               </Col>
             </Row> */}
-            <Row>
-              <Col>
-                <Table
-                  bordered
-                  dataSource={orders}
-                  columns={columns}
-                  scroll={{ x: true }}
-                  loading={isLoading}
-                  pagination={{
-                    position: ["bottomCenter"],
-                    showSizeChanger: true,
-                  }}
-                  rowKey={(item) => item.id}
-                  //   expandable={{
-                  //     expandedRowRender: (item) => {
-                  //       return (
-                  //         <div>
-                  //           <Row>
-                  //             <Col>
-                  //               <Space direction="vertical" wrap className='w-1002'>
-                  //                 <strong>Order ID</strong>
-                  //                 <p>{item?.id ?? ''}</p>
-                  //                 {/* <strong>Description:</strong>
-                  //                 <p style={{ margin: 0, textAlign: 'justify' }}>
-                  //                   {item.description}
-                  //                 </p> */}
-                  //                 <div className="row">
-                  //                   <div className="col-12">
-                  //                     <strong>Order Date</strong>
-                  //                     <p>{item?.orderDate}</p>
-                  //                   </div>
-                  //                 </div>
-                  //                 <div className="row">
-                  //                   <div className="col-6">
-                  //                     <strong>First Name</strong>
-                  //                     <p>{item?.first_name}</p>
-                  //                   </div>
-                  //                   <div className="col-6">
-                  //                     <strong>Last Name</strong>
-                  //                     <p>{item?.last_name}</p>
-                  //                   </div>
-                  //                 </div>
-                  //                 <div className="row">
-                  //                   {/* <div className="col-6">
-                  //                     <strong>Price</strong>
-                  //                     <p>{item?.price}</p>
-                  //                   </div> */}
-                  //                   <div className="col-6">
-                  //                     <strong>Order Status</strong>
-                  //                     <p>{item?.orderStatus}</p>
-                  //                   </div>
-                  //                 </div>
-                  //               </Space>
-                  //             </Col>
-                  //           </Row>
-                  //         </div>
-                  //       )
-                  //     },
-                  //   }}
-                />
-              </Col>
-            </Row>
-          </TabPane>
-          <TabPane key="2">
-            <Card className="rounded">
-              <Row className="mb-2">
+              <Row>
                 <Col>
+                  <Table
+                    bordered
+                    dataSource={orders}
+                    columns={columns}
+                    scroll={{ x: true }}
+                    loading={isLoading}
+                    pagination={{
+                      position: ["bottomCenter"],
+                      showSizeChanger: true,
+                    }}
+                    rowKey={(item) => item.id}
+                    //   expandable={{
+                    //     expandedRowRender: (item) => {
+                    //       return (
+                    //         <div>
+                    //           <Row>
+                    //             <Col>
+                    //               <Space direction="vertical" wrap className='w-1002'>
+                    //                 <strong>Order ID</strong>
+                    //                 <p>{item?.id ?? ''}</p>
+                    //                 {/* <strong>Description:</strong>
+                    //                 <p style={{ margin: 0, textAlign: 'justify' }}>
+                    //                   {item.description}
+                    //                 </p> */}
+                    //                 <div className="row">
+                    //                   <div className="col-12">
+                    //                     <strong>Order Date</strong>
+                    //                     <p>{item?.orderDate}</p>
+                    //                   </div>
+                    //                 </div>
+                    //                 <div className="row">
+                    //                   <div className="col-6">
+                    //                     <strong>First Name</strong>
+                    //                     <p>{item?.first_name}</p>
+                    //                   </div>
+                    //                   <div className="col-6">
+                    //                     <strong>Last Name</strong>
+                    //                     <p>{item?.last_name}</p>
+                    //                   </div>
+                    //                 </div>
+                    //                 <div className="row">
+                    //                   {/* <div className="col-6">
+                    //                     <strong>Price</strong>
+                    //                     <p>{item?.price}</p>
+                    //                   </div> */}
+                    //                   <div className="col-6">
+                    //                     <strong>Order Status</strong>
+                    //                     <p>{item?.orderStatus}</p>
+                    //                   </div>
+                    //                 </div>
+                    //               </Space>
+                    //             </Col>
+                    //           </Row>
+                    //         </div>
+                    //       )
+                    //     },
+                    //   }}
+                  />
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane key="2">
+              <Card className="rounded">
+                <Row className="mb-2">
+                  <Col>
+                    <Button
+                      onClick={handleBack}
+                      className="btnSecondary"
+                      type="primary"
+                    >
+                      <i className="fa fa-arrow-left me-1"> </i>Back
+                    </Button>
+                  </Col>
+                </Row>
+                {edit && (
+                  <Form
+                    size="large"
+                    form={editForm}
+                    layout="vertical"
+                    onFinish={handleEditOrder}
+                  >
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Name"
+                          name="name"
+                          rules={[
+                            { required: true, message: "Please enter title!" },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Input type="text" />
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Description"
+                          name="description"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter description!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Input.TextArea />
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          name="price"
+                          label="Price"
+                          className="fw-bold"
+                          rules={[
+                            { required: true, message: "Please enter price!" },
+                          ]}
+                        >
+                          <Input
+                            onChange={(e) => setOriginalPrice(e.target.value)}
+                            prefix={<PoundCircleFilled />}
+                            type="number"
+                          />
+                        </Item>
+                      </Col>
+                      <Col>
+                        <Item
+                          label={
+                            <>
+                              <div>
+                                Discount (optional)
+                                <div>
+                                  <Radio.Group
+                                    onChange={(e) => {
+                                      setDiscountType(e.target.value)
+                                      handleDiscount(discount)
+                                    }}
+                                    value={discountType}
+                                  >
+                                    <Radio title="Flat Discount" value="£">
+                                      £
+                                    </Radio>
+                                    <Radio
+                                      title="Percentage Discount"
+                                      value="%"
+                                    >
+                                      %
+                                    </Radio>
+                                  </Radio.Group>
+                                </div>
+                              </div>
+                            </>
+                          }
+                          className="fw-bold"
+                        >
+                          <Input
+                            name="discount"
+                            onChange={(e) => handleDiscount(e.target.value)}
+                            min={0}
+                            value={discount}
+                            prefix={discountType}
+                            type="number"
+                          />
+                        </Item>
+                        <span>
+                          <strong>
+                            Discounted Price:{" "}
+                            <span className="text-primary">
+                              {" "}
+                              £ {discountedPrice}
+                            </span>
+                          </strong>
+                        </span>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Category"
+                          name="category"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select category!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            clearIcon
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
+                            maxTagCount={1}
+                            placeholder="Select Category"
+                            onSearch={(val) => setCatSearch(val.trim())}
+                            notFoundContent={
+                              <div
+                                onClick={handleAddCategory}
+                                title={`Add ${catSearch} to categories`}
+                                style={{ cursor: "pointer", color: "black" }}
+                              >
+                                <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                                <span className="me-2">Add</span>
+                                <span
+                                  className="px-2"
+                                  style={{ backgroundColor: "#F0F2F5" }}
+                                >
+                                  {catSearch}
+                                </span>
+                              </div>
+                            }
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {categ &&
+                              categ?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Colors"
+                          name="colors"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select product colors!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            mode="multiple"
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
+                            // maxTagCount={3}
+                            placeholder="Select Colors"
+                            onSearch={(val) => setColorSearch(val.trim())}
+                            notFoundContent={
+                              <div
+                                onClick={handleAddColor}
+                                title={`Add ${colorSearch} to Colors`}
+                                style={{ cursor: "pointer", color: "black" }}
+                              >
+                                <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                                <span className="me-2">Add</span>
+                                <span
+                                  className="px-2"
+                                  style={{ backgroundColor: "#F0F2F5" }}
+                                >
+                                  {colorSearch}
+                                </span>
+                              </div>
+                            }
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {colors &&
+                              colors?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Stitched"
+                          name="is_stitched"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select stitched!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            placeholder="Select Stitched"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            <Option value={"yes"}>Yes</Option>
+                            <Option value={"no"}>No</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Cloth Types"
+                          name="cloth_type"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select cloth type!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            maxTagCount={1}
+                            clearIcon
+                            placeholder="Select Cloth Type"
+                            onSearch={(val) => setClothTypeSearch(val.trim())}
+                            notFoundContent={
+                              <div
+                                onClick={handleAddClothType}
+                                title={`Add ${clothTypeSearch} to Cloth Types`}
+                                style={{ cursor: "pointer", color: "black" }}
+                              >
+                                <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                                <span className="me-2">Add</span>
+                                <span
+                                  className="px-2"
+                                  style={{ backgroundColor: "#F0F2F5" }}
+                                >
+                                  {clothTypeSearch}
+                                </span>
+                              </div>
+                            }
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {clothTypes &&
+                              clothTypes?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Brand"
+                          name="brand"
+                          rules={[
+                            { required: true, message: "Please select brand!" },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            maxTagCount={1}
+                            clearIcon
+                            placeholder="Select Brand"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {brands &&
+                              brands?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="New Product"
+                          name={"is-new-product"}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select an option!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            placeholder="New Product"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            <Option value={true}>Yes</Option>
+                            <Option value={false}>No</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Sizes"
+                          name="sizes"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select cloth type!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            mode="multiple"
+                            clearIcon
+                            placeholder="Select Sizes"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            <Option value={"xs"}>XS</Option>
+                            <Option value={"s"}>S</Option>
+                            <Option value={"m"}>M</Option>
+                            <Option value={"l"}>L</Option>
+                            <Option value={"xl"}>XL</Option>
+                            <Option value={"xxl"}>XXL</Option>
+                            <Option value={"xxxl"}>XXXL</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Image"
+                          name="image"
+                          // rules={[
+                          //   { required: true, message: 'Please select images!' },
+                          // ]}
+                          className="fw-bold"
+                        >
+                          <Upload
+                            accept="image/*"
+                            customRequest={dummyRequest}
+                            onRemove={() => {
+                              setFileName("")
+                            }}
+                            listType="picture"
+                            multiple
+                          >
+                            <Button icon={<UploadOutlined />}>
+                              Click to Upload
+                            </Button>
+                          </Upload>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <Item
+                          label="Existing Images"
+                          className="fw-bold d-flex"
+                        >
+                          {edit &&
+                            edit?.image?.map((item, index) => (
+                              <div className="position-relative d-flex">
+                                <div>
+                                  <i
+                                    className="fas fa-trash fs-5"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={(e) => {
+                                      let arr = [...productDetails?.image]
+                                      arr?.splice(index, 1)
+                                      setEdit((prev) => ({
+                                        ...prev,
+                                        image: [...arr],
+                                      }))
+                                    }}
+                                  ></i>
+                                  <Avatar
+                                    size={80}
+                                    style={{ cursor: "pointer" }}
+                                    key={item}
+                                    className="me-2"
+                                    shape="square"
+                                    src={<Image src={item} preview={true} />}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="d-flex justify-content-end">
+                        <Button
+                          loading={btnUpload}
+                          className="btnPrimary"
+                          htmlType="submit"
+                          type="primary"
+                        >
+                          Update
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Form>
+                )}
+              </Card>
+            </TabPane>
+          </Tabs>
+          <BackTop>
+            <div style={backToTop}>
+              <i className="fas fa-arrow-up"></i>
+            </div>
+          </BackTop>
+          {/* add new product */}
+          <Modal
+            title="Add Order"
+            visible={show}
+            footer={false}
+            onCancel={handleModalClose}
+            width="900px"
+          >
+            <Form
+              size="large"
+              form={form}
+              layout="vertical"
+              onFinish={handleAddOrder}
+            >
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Name"
+                    name="name"
+                    rules={[{ required: true, message: "Please enter title!" }]}
+                    className="fw-bold"
+                  >
+                    <Input type="text" />
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Description"
+                    name="description"
+                    rules={[
+                      { required: true, message: "Please enter description!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Input.TextArea />
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    name="price"
+                    label="Price"
+                    className="fw-bold"
+                    rules={[{ required: true, message: "Please enter price!" }]}
+                  >
+                    <Input
+                      onChange={(e) => setOriginalPrice(e.target.value)}
+                      prefix={<PoundCircleFilled />}
+                      type="number"
+                    />
+                  </Item>
+                </Col>
+                <Col>
+                  <Item
+                    label={
+                      <>
+                        <div>
+                          Discount (optional)
+                          <div>
+                            <Radio.Group
+                              onChange={(e) => {
+                                setDiscountType(e.target.value)
+                                handleDiscount(discount)
+                              }}
+                              value={discountType}
+                            >
+                              <Radio title="Flat Discount" value="£">
+                                £
+                              </Radio>
+                              <Radio title="Percentage Discount" value="£">
+                                %
+                              </Radio>
+                            </Radio.Group>
+                          </div>
+                        </div>
+                      </>
+                    }
+                    className="fw-bold"
+                  >
+                    <Input
+                      name="discount"
+                      onChange={(e) => handleDiscount(e.target.value)}
+                      min={0}
+                      value={discount}
+                      prefix={discountType}
+                      type="number"
+                    />
+                  </Item>
+                  <span>
+                    <strong>
+                      Discounted Price:{" "}
+                      <span className="text-primary"> £ {discountedPrice}</span>
+                    </strong>
+                  </span>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Category"
+                    name="category"
+                    rules={[
+                      { required: true, message: "Please select category!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      clearIcon
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      maxTagCount={1}
+                      placeholder="Select Category"
+                      onSearch={(val) => setCatSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddCategory}
+                          title={`Add ${catSearch} to categories`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {catSearch}
+                          </span>
+                        </div>
+                      }
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {categ &&
+                        categ?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Colors"
+                    name="colors"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select product colors!",
+                      },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      mode="multiple"
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      // maxTagCount={3}
+                      placeholder="Select Colors"
+                      onSearch={(val) => setColorSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddColor}
+                          title={`Add ${colorSearch} to Colors`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {colorSearch}
+                          </span>
+                        </div>
+                      }
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {colors &&
+                        colors?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Stitched"
+                    name="is_stitched"
+                    rules={[
+                      { required: true, message: "Please select stitched!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      placeholder="Select Stitched"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      <Option value={"yes"}>Yes</Option>
+                      <Option value={"no"}>No</Option>
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Cloth Types"
+                    name="cloth_type"
+                    rules={[
+                      { required: true, message: "Please select cloth type!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      maxTagCount={1}
+                      clearIcon
+                      placeholder="Select Cloth Type"
+                      onSearch={(val) => setClothTypeSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddClothType}
+                          title={`Add ${clothTypeSearch} to Cloth Types`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {clothTypeSearch}
+                          </span>
+                        </div>
+                      }
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {clothTypes &&
+                        clothTypes?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Brand"
+                    name="brand"
+                    rules={[
+                      { required: true, message: "Please select brand!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      maxTagCount={1}
+                      clearIcon
+                      placeholder="Select Brand"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {brands &&
+                        brands?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="New Product"
+                    name={"is-new-product"}
+                    rules={[
+                      { required: true, message: "Please check this field!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      placeholder="Select Stitched"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      <Option value={"yes"}>Yes</Option>
+                      <Option value={"no"}>No</Option>
+                    </Select>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Sizes"
+                    name="sizes"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select cloth type!",
+                      },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      mode="multiple"
+                      clearIcon
+                      placeholder="Select Sizes"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      <Option value={"xs"}>XS</Option>
+                      <Option value={"s"}>S</Option>
+                      <Option value={"m"}>M</Option>
+                      <Option value={"L"}>L</Option>
+                      <Option value={"XL"}>XL</Option>
+                      <Option value={"XXl"}>XXL</Option>
+                      <Option value={"XXXL"}>XXXL</Option>
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Image"
+                    name="image"
+                    rules={[
+                      { required: true, message: "Please select images!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Upload
+                      accept="image/*"
+                      customRequest={dummyRequest}
+                      onRemove={() => {
+                        setFileName("")
+                      }}
+                      listType="picture"
+                      multiple
+                    >
+                      <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                    </Upload>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex justify-content-end">
                   <Button
-                    onClick={handleBack}
-                    className="btnSecondary"
+                    loading={btnUpload}
+                    className="btnPrimary"
+                    htmlType="submit"
                     type="primary"
                   >
-                    <i className="fa fa-arrow-left me-1"> </i>Back
+                    Post Product
                   </Button>
                 </Col>
               </Row>
-              {edit && (
-                <Form
-                  size="large"
-                  form={editForm}
-                  layout="vertical"
-                  onFinish={handleEditOrder}
-                >
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Name"
-                        name="name"
-                        rules={[
-                          { required: true, message: "Please enter title!" },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Input type="text" />
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Description"
-                        name="description"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter description!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Input.TextArea />
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        name="price"
-                        label="Price"
-                        className="fw-bold"
-                        rules={[
-                          { required: true, message: "Please enter price!" },
-                        ]}
-                      >
-                        <Input
-                          onChange={(e) => setOriginalPrice(e.target.value)}
-                          prefix={<PoundCircleFilled />}
-                          type="number"
-                        />
-                      </Item>
-                    </Col>
-                    <Col>
-                      <Item
-                        label={
-                          <>
-                            <div>
-                              Discount (optional)
-                              <div>
-                                <Radio.Group
-                                  onChange={(e) => {
-                                    setDiscountType(e.target.value)
-                                    handleDiscount(discount)
-                                  }}
-                                  value={discountType}
-                                >
-                                  <Radio title="Flat Discount" value="£">
-                                    £
-                                  </Radio>
-                                  <Radio title="Percentage Discount" value="%">
-                                    %
-                                  </Radio>
-                                </Radio.Group>
-                              </div>
-                            </div>
-                          </>
-                        }
-                        className="fw-bold"
-                      >
-                        <Input
-                          name="discount"
-                          onChange={(e) => handleDiscount(e.target.value)}
-                          min={0}
-                          value={discount}
-                          prefix={discountType}
-                          type="number"
-                        />
-                      </Item>
-                      <span>
-                        <strong>
-                          Discounted Price:{" "}
-                          <span className="text-primary">
-                            {" "}
-                            £ {discountedPrice}
-                          </span>
-                        </strong>
-                      </span>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Category"
-                        name="category"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select category!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          clearIcon
-                          filterOption={(input, option) =>
-                            option.children
-                              .toLowerCase()
-                              .indexOf(input.toLowerCase()) >= 0
-                          }
-                          maxTagCount={1}
-                          placeholder="Select Category"
-                          onSearch={(val) => setCatSearch(val.trim())}
-                          notFoundContent={
-                            <div
-                              onClick={handleAddCategory}
-                              title={`Add ${catSearch} to categories`}
-                              style={{ cursor: "pointer", color: "black" }}
-                            >
-                              <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                              <span className="me-2">Add</span>
-                              <span
-                                className="px-2"
-                                style={{ backgroundColor: "#F0F2F5" }}
-                              >
-                                {catSearch}
-                              </span>
-                            </div>
-                          }
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {categ &&
-                            categ?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Colors"
-                        name="colors"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select product colors!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          mode="multiple"
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            option.children
-                              .toLowerCase()
-                              .indexOf(input.toLowerCase()) >= 0
-                          }
-                          // maxTagCount={3}
-                          placeholder="Select Colors"
-                          onSearch={(val) => setColorSearch(val.trim())}
-                          notFoundContent={
-                            <div
-                              onClick={handleAddColor}
-                              title={`Add ${colorSearch} to Colors`}
-                              style={{ cursor: "pointer", color: "black" }}
-                            >
-                              <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                              <span className="me-2">Add</span>
-                              <span
-                                className="px-2"
-                                style={{ backgroundColor: "#F0F2F5" }}
-                              >
-                                {colorSearch}
-                              </span>
-                            </div>
-                          }
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {colors &&
-                            colors?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Stitched"
-                        name="is_stitched"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select stitched!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          placeholder="Select Stitched"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          <Option value={"yes"}>Yes</Option>
-                          <Option value={"no"}>No</Option>
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Cloth Types"
-                        name="cloth_type"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select cloth type!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          maxTagCount={1}
-                          clearIcon
-                          placeholder="Select Cloth Type"
-                          onSearch={(val) => setClothTypeSearch(val.trim())}
-                          notFoundContent={
-                            <div
-                              onClick={handleAddClothType}
-                              title={`Add ${clothTypeSearch} to Cloth Types`}
-                              style={{ cursor: "pointer", color: "black" }}
-                            >
-                              <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                              <span className="me-2">Add</span>
-                              <span
-                                className="px-2"
-                                style={{ backgroundColor: "#F0F2F5" }}
-                              >
-                                {clothTypeSearch}
-                              </span>
-                            </div>
-                          }
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {clothTypes &&
-                            clothTypes?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Brand"
-                        name="brand"
-                        rules={[
-                          { required: true, message: "Please select brand!" },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          maxTagCount={1}
-                          clearIcon
-                          placeholder="Select Brand"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {brands &&
-                            brands?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="New Product"
-                        name={"is-new-product"}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select an option!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          placeholder="New Product"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          <Option value={true}>Yes</Option>
-                          <Option value={false}>No</Option>
-                        </Select>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Sizes"
-                        name="sizes"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select cloth type!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          mode="multiple"
-                          clearIcon
-                          placeholder="Select Sizes"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          <Option value={"xs"}>XS</Option>
-                          <Option value={"s"}>S</Option>
-                          <Option value={"m"}>M</Option>
-                          <Option value={"l"}>L</Option>
-                          <Option value={"xl"}>XL</Option>
-                          <Option value={"xxl"}>XXL</Option>
-                          <Option value={"xxxl"}>XXXL</Option>
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Image"
-                        name="image"
-                        // rules={[
-                        //   { required: true, message: 'Please select images!' },
-                        // ]}
-                        className="fw-bold"
-                      >
-                        <Upload
-                          accept="image/*"
-                          customRequest={dummyRequest}
-                          onRemove={() => {
-                            setFileName("")
-                          }}
-                          listType="picture"
-                          multiple
-                        >
-                          <Button icon={<UploadOutlined />}>
-                            Click to Upload
-                          </Button>
-                        </Upload>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <Item label="Existing Images" className="fw-bold d-flex">
-                        {edit &&
-                          edit?.image?.map((item, index) => (
-                            <div className="position-relative d-flex">
-                              <div>
-                                <i
-                                  className="fas fa-trash fs-5"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={(e) => {
-                                    let arr = [...productDetails?.image]
-                                    arr?.splice(index, 1)
-                                    setEdit((prev) => ({
-                                      ...prev,
-                                      image: [...arr],
-                                    }))
-                                  }}
-                                ></i>
-                                <Avatar
-                                  size={80}
-                                  style={{ cursor: "pointer" }}
-                                  key={item}
-                                  className="me-2"
-                                  shape="square"
-                                  src={<Image src={item} preview={true} />}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="d-flex justify-content-end">
-                      <Button
-                        loading={btnUpload}
-                        className="btnPrimary"
-                        htmlType="submit"
-                        type="primary"
-                      >
-                        Update
-                      </Button>
-                    </Col>
-                  </Row>
-                </Form>
-              )}
-            </Card>
-          </TabPane>
-        </Tabs>
-        <BackTop>
-          <div style={backToTop}>
-            <i className="fas fa-arrow-up"></i>
-          </div>
-        </BackTop>
-        {/* add new product */}
-        <Modal
-          title="Add Order"
-          visible={show}
-          footer={false}
-          onCancel={handleModalClose}
-          width="900px"
-        >
-          <Form
-            size="large"
-            form={form}
-            layout="vertical"
-            onFinish={handleAddOrder}
-          >
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Name"
-                  name="name"
-                  rules={[{ required: true, message: "Please enter title!" }]}
-                  className="fw-bold"
-                >
-                  <Input type="text" />
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Description"
-                  name="description"
-                  rules={[
-                    { required: true, message: "Please enter description!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Input.TextArea />
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  name="price"
-                  label="Price"
-                  className="fw-bold"
-                  rules={[{ required: true, message: "Please enter price!" }]}
-                >
-                  <Input
-                    onChange={(e) => setOriginalPrice(e.target.value)}
-                    prefix={<PoundCircleFilled />}
-                    type="number"
-                  />
-                </Item>
-              </Col>
-              <Col>
-                <Item
-                  label={
-                    <>
-                      <div>
-                        Discount (optional)
-                        <div>
-                          <Radio.Group
-                            onChange={(e) => {
-                              setDiscountType(e.target.value)
-                              handleDiscount(discount)
-                            }}
-                            value={discountType}
-                          >
-                            <Radio title="Flat Discount" value="£">
-                              £
-                            </Radio>
-                            <Radio title="Percentage Discount" value="£">
-                              %
-                            </Radio>
-                          </Radio.Group>
-                        </div>
-                      </div>
-                    </>
-                  }
-                  className="fw-bold"
-                >
-                  <Input
-                    name="discount"
-                    onChange={(e) => handleDiscount(e.target.value)}
-                    min={0}
-                    value={discount}
-                    prefix={discountType}
-                    type="number"
-                  />
-                </Item>
-                <span>
-                  <strong>
-                    Discounted Price:{" "}
-                    <span className="text-primary"> £ {discountedPrice}</span>
-                  </strong>
-                </span>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Category"
-                  name="category"
-                  rules={[
-                    { required: true, message: "Please select category!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    clearIcon
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    maxTagCount={1}
-                    placeholder="Select Category"
-                    onSearch={(val) => setCatSearch(val.trim())}
-                    notFoundContent={
-                      <div
-                        onClick={handleAddCategory}
-                        title={`Add ${catSearch} to categories`}
-                        style={{ cursor: "pointer", color: "black" }}
-                      >
-                        <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                        <span className="me-2">Add</span>
-                        <span
-                          className="px-2"
-                          style={{ backgroundColor: "#F0F2F5" }}
-                        >
-                          {catSearch}
-                        </span>
-                      </div>
-                    }
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {categ &&
-                      categ?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Colors"
-                  name="colors"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select product colors!",
-                    },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    mode="multiple"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    // maxTagCount={3}
-                    placeholder="Select Colors"
-                    onSearch={(val) => setColorSearch(val.trim())}
-                    notFoundContent={
-                      <div
-                        onClick={handleAddColor}
-                        title={`Add ${colorSearch} to Colors`}
-                        style={{ cursor: "pointer", color: "black" }}
-                      >
-                        <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                        <span className="me-2">Add</span>
-                        <span
-                          className="px-2"
-                          style={{ backgroundColor: "#F0F2F5" }}
-                        >
-                          {colorSearch}
-                        </span>
-                      </div>
-                    }
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {colors &&
-                      colors?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Stitched"
-                  name="is_stitched"
-                  rules={[
-                    { required: true, message: "Please select stitched!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    placeholder="Select Stitched"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    <Option value={"yes"}>Yes</Option>
-                    <Option value={"no"}>No</Option>
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Cloth Types"
-                  name="cloth_type"
-                  rules={[
-                    { required: true, message: "Please select cloth type!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    maxTagCount={1}
-                    clearIcon
-                    placeholder="Select Cloth Type"
-                    onSearch={(val) => setClothTypeSearch(val.trim())}
-                    notFoundContent={
-                      <div
-                        onClick={handleAddClothType}
-                        title={`Add ${clothTypeSearch} to Cloth Types`}
-                        style={{ cursor: "pointer", color: "black" }}
-                      >
-                        <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                        <span className="me-2">Add</span>
-                        <span
-                          className="px-2"
-                          style={{ backgroundColor: "#F0F2F5" }}
-                        >
-                          {clothTypeSearch}
-                        </span>
-                      </div>
-                    }
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {clothTypes &&
-                      clothTypes?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Brand"
-                  name="brand"
-                  rules={[{ required: true, message: "Please select brand!" }]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    maxTagCount={1}
-                    clearIcon
-                    placeholder="Select Brand"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {brands &&
-                      brands?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="New Product"
-                  name={"is-new-product"}
-                  rules={[
-                    { required: true, message: "Please check this field!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    placeholder="Select Stitched"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    <Option value={"yes"}>Yes</Option>
-                    <Option value={"no"}>No</Option>
-                  </Select>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Sizes"
-                  name="sizes"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select cloth type!",
-                    },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    mode="multiple"
-                    clearIcon
-                    placeholder="Select Sizes"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    <Option value={"xs"}>XS</Option>
-                    <Option value={"s"}>S</Option>
-                    <Option value={"m"}>M</Option>
-                    <Option value={"L"}>L</Option>
-                    <Option value={"XL"}>XL</Option>
-                    <Option value={"XXl"}>XXL</Option>
-                    <Option value={"XXXL"}>XXXL</Option>
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Image"
-                  name="image"
-                  rules={[{ required: true, message: "Please select images!" }]}
-                  className="fw-bold"
-                >
-                  <Upload
-                    accept="image/*"
-                    customRequest={dummyRequest}
-                    onRemove={() => {
-                      setFileName("")
-                    }}
-                    listType="picture"
-                    multiple
-                  >
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                  </Upload>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col className="d-flex justify-content-end">
-                <Button
-                  loading={btnUpload}
-                  className="btnPrimary"
-                  htmlType="submit"
-                  type="primary"
-                >
-                  Post Product
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-        </Modal>
-      </Container>
-    </Spin>
+            </Form>
+          </Modal>
+        </Container>
+      </Spin>
     </>
   )
 }

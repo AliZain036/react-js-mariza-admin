@@ -9,11 +9,11 @@ import {
   Modal,
   Select,
   Spin,
-} from 'antd'
-import React, { useEffect, useState } from 'react'
-import { Col, Container, Row } from 'react-bootstrap'
-import { addDoc, getData, updateDoc } from '../Firebase/utils'
-import { firebase } from '../Firebase/config'
+} from "antd"
+import React, { useEffect, useState } from "react"
+import { Col, Container, Row } from "react-bootstrap"
+import { addDoc, getData, updateDoc } from "../Firebase/utils"
+import { firebase } from "../Firebase/config"
 
 const SpecialOffer = () => {
   const [offerDetail, setOfferDetail] = useState({})
@@ -31,7 +31,7 @@ const SpecialOffer = () => {
   const fetchOfferDetail = async () => {
     try {
       setLoading(true)
-      const data = await getData('specialOffer')
+      const data = await getData("specialOffer")
       setLoading(false)
       setOfferDetail(data[0])
       //   updateForm.setFields([{name: 'offer', value}])
@@ -48,8 +48,8 @@ const SpecialOffer = () => {
       setLoading(true)
       let response = await firebase
         .firestore()
-        .collection('products')
-        .where('is_discounted', '==', false)
+        .collection("products")
+        .where("is_discounted", "==", false)
         .get()
       let data = response.docs.map((doc) => {
         return { ...doc.data(), id: doc.id }
@@ -66,13 +66,33 @@ const SpecialOffer = () => {
   const handleUpdateOffer = async (formValues) => {
     try {
       setLoading(true)
+      let promises = []
+      formValues?.products?.forEach((prodId) => {
+        const productToUpdate = products.find((item) => item.id === prodId)
+        const price =
+          (+productToUpdate?.originalPrice / 100) * +formValues?.offer
+        const disPrice = +productToUpdate?.originalPrice - price
+        const body = {
+          price: disPrice,
+          discountType: "%",
+          discount: formValues?.offer,
+          is_discounted: true,
+        }
+        const promise = firebase
+          .firestore()
+          .collection("products")
+          .doc(productToUpdate?.id)
+          .update(body)
+        promises.push(promise)
+      })
+      const allPromisesRes = await Promise.all(promises)
       firebase
         .firestore()
-        .collection('specialOffer')
+        .collection("specialOffer")
         .doc(offerDetail.id)
         .update(formValues)
         .then(() => {
-          message.success('Special offer updated successfully!')
+          message.success("Special offer updated successfully!")
           setIsUpdateOfferModalOpen(false)
           fetchOfferDetail()
         })
@@ -92,9 +112,9 @@ const SpecialOffer = () => {
       //   )
       //   formValues.products = [...filteredProducts]
       setLoading(true)
-      const result = await addDoc('specialOffer', formValues)
+      const result = await addDoc("specialOffer", formValues)
       if (result === true) {
-        message.success('Special offer added successfully!')
+        message.success("Special offer added successfully!")
         setIsAddOfferModalOpen(false)
         fetchOfferDetail()
       }
@@ -137,33 +157,39 @@ const SpecialOffer = () => {
               )}
             </div>
           </div>
-          <p className='mt-3'>
+          <p className="mt-3">
             <b>*Note: </b>Products with discount cannot be added to special
             offer. Discount should be removed from products in order to add them
             to special offer.
           </p>
           {offerDetail?.isActive && (
             <>
-              <div className="mt-3" style={{ marginTop: '1px solid' }}>
+              <div className="mt-3" style={{ marginTop: "1px solid" }}>
                 <h5>Offer: {offerDetail?.offer}%</h5>
               </div>
               <div className="mt-3">
-                <h5>Active: {offerDetail?.isActive ? 'Yes' : 'False'}</h5>
+                <h5>Active: {offerDetail?.isActive ? "Yes" : "False"}</h5>
               </div>
               <div className="mt-3">
                 <h5>Products List</h5>
                 <div className="mt-2">
-                  <Row>
+                  <Row className="pb-3">
                     {offerDetail &&
                       offerDetail?.products?.map((pro) => {
                         let product = products?.find((item) => item?.id === pro)
                         if (product) {
                           return (
                             <Col md={6} key={product?.id}>
-                              <div style={{ border: '1px solid lightgrey' }}>
+                              <div
+                                style={{
+                                  border: "1px solid lightgrey",
+                                  borderRadius: "12px",
+                                  padding: "1.5rem",
+                                }}
+                              >
                                 <Avatar
                                   size={100}
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: "pointer" }}
                                   className="me-2"
                                   shape="square"
                                   src={
@@ -208,9 +234,9 @@ const SpecialOffer = () => {
             <Row>
               <Col md={6}>
                 <Form.Item
-                  label="Offer"
+                  label="Offer (%)"
                   name="offer"
-                  rules={[{ required: true, message: 'Please add offer!' }]}
+                  rules={[{ required: true, message: "Please add offer!" }]}
                   className="fw-bold"
                 >
                   <Input type="number" min={0} max={90} />
@@ -223,13 +249,12 @@ const SpecialOffer = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select one field!',
+                      message: "Please select one field!",
                     },
                   ]}
                   className="fw-bold"
                 >
                   <Select
-                    showSearch
                     clearIcon
                     maxTagCount={1}
                     placeholder="Select Active Status"
@@ -249,7 +274,7 @@ const SpecialOffer = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select at least one product!',
+                      message: "Please select at least one product!",
                     },
                   ]}
                   className="fw-bold"
@@ -311,7 +336,7 @@ const SpecialOffer = () => {
                 <Form.Item
                   label="Offer"
                   name="offer"
-                  rules={[{ required: true, message: 'Please add offer!' }]}
+                  rules={[{ required: true, message: "Please add offer!" }]}
                   className="fw-bold"
                 >
                   <Input type="number" min={0} max={90} />
@@ -324,7 +349,7 @@ const SpecialOffer = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select one field!',
+                      message: "Please select one field!",
                     },
                   ]}
                   className="fw-bold"
@@ -350,7 +375,7 @@ const SpecialOffer = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Please select at least one product!',
+                      message: "Please select at least one product!",
                     },
                   ]}
                   className="fw-bold"
