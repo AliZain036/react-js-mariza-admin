@@ -99,6 +99,8 @@ const Products = () => {
   const [text, setText] = React.useState("")
   const [allWishlist, setAllWishlist] = React.useState("")
   const currentdateTime = moment().format("DD-MM-YYYY hh:mm:ss A")
+  const [offerDetail, setOfferDetail] = useState({})
+  const [showPopConfirm, setShowPopConfirm] = useState(false)
 
   // redux
   const categoriesRedux = useSelector((state) => state.categories)
@@ -212,7 +214,12 @@ const Products = () => {
           <Tooltip title={`Edit ${item.name}`}>
             <Button
               onClick={() => {
-                console.log({ item })
+                const isSpecialOfferProduct = offerDetail?.products?.includes(
+                  item?.id
+                )
+                if (isSpecialOfferProduct) {
+                  setShowPopConfirm(true)
+                } else setShowPopConfirm(false)
                 setProductDetails({ ...item })
                 handleEdit(item)
               }}
@@ -253,12 +260,20 @@ const Products = () => {
     getProducts()
     getCategories() // redux
     dispatch(fetchProducts())
-    getUsers()
-    getWishlist()
     getColors()
     getClothTypes()
     getBrands()
+    fetchOfferDetail()
   }, [])
+
+  const fetchOfferDetail = async () => {
+    try {
+      const data = await getData("specialOffer")
+      setOfferDetail(data[0])
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const getBrands = async () => {
     let data = await getData("brands")
@@ -305,7 +320,6 @@ const Products = () => {
 
   useEffect(() => {
     setAllProducts(productsRedux.products)
-    console.log(productsRedux.products)
     setSearch(productsRedux.products)
   }, [productsRedux])
 
@@ -323,24 +337,10 @@ const Products = () => {
     }
   }
 
-  // search in products
-  const handleSearch = (value) => {
-    value = value.trim().toLowerCase()
-    var arr = cloneDeep(allProducts)
-    arr = arr?.filter((item) => item.name.toLowerCase().includes(value))
-    for (var i = 0; i < arr.length; i++) {
-      categ.forEach((item) => {
-        if (item.id === arr[i].category) {
-          arr[i].category = item
-        }
-      })
-    }
-    setSearch(arr)
-  }
-
   // add product in modal
   const handleAddProduct = async (values) => {
-    if (discount) {
+    const discountValue = form.getFieldValue("discount")
+    if (!discountValue || discountValue === "0") {
       values["is_discounted"] = true
     } else {
       values["is_discounted"] = false
@@ -471,7 +471,6 @@ const Products = () => {
       })
     })
     // const filterUser = allUsers.id.filter(temp)
-    console.log(newuser, "email")
     newuser.map((user) => {
       const notification = {
         id: user.id,
@@ -489,13 +488,10 @@ const Products = () => {
         targetAdress: user,
       })
         .then((res) => {
-          console.log(res, "Email Sent! res")
         })
         .catch((err) => {
-          console.log(err, "Email Sent err!")
         })
 
-      console.log("Email Sent!")
     })
   }
   const handleEditProduct = async (values) => {
@@ -512,17 +508,14 @@ const Products = () => {
       }
     }
     values.discountType = discountType
-    // console.log(values.image);
     setBtnUpload(true)
     // return;
     if (values.image.fileList) {
-      console.log(values.image)
       const url = await multiImageUpload("products", values.image.fileList)
       values.image = [...url, ...edit.image]
     } else {
       values.image = [...edit.image]
     }
-    console.log("values on eidt product", values.price, edit.price)
     if (values.price !== edit.price) {
       sendProductsNotifictaion(values)
     }
@@ -533,11 +526,25 @@ const Products = () => {
     let sizes = values?.sizes?.map((size) => size?.toLowerCase())
     values.sizes = sizes
     values.stock = Number(values.stock)
-    if (!editForm.getFieldValue("discount")) {
+    if (
+      !editForm.getFieldValue("discount") ||
+      editForm.getFieldValue("discount") == "0"
+    ) {
       values["is_discounted"] = false
+      values["is_valid_special_offer_product"] = true
     } else {
       values["is_discounted"] = true
+      values["is_valid_special_offer_product"] = false
     }
+    if (showPopConfirm === true && edit?.discount != values?.discount) {
+      values["is_valid_special_offer_product"] = false
+    } else if (showPopConfirm === true && edit?.discount == values?.discount) {
+      values["is_valid_special_offer_product"] = true
+    }
+
+    let arr = offerDetail?.products
+    let ind = offerDetail?.products?.findIndex((item) => item === edit?.id)
+    arr.splice(ind, 1)
 
     await firebase
       .firestore()
@@ -550,11 +557,19 @@ const Products = () => {
         getProducts()
         dispatch(fetchProducts())
       })
+    let tempOfferDetail = offerDetail
+    tempOfferDetail.products = arr
+    if (showPopConfirm === true && edit?.discount != values?.discount) {
+      await firebase
+        .firestore()
+        .collection("specialOffer")
+        .doc(offerDetail?.id)
+        .update(tempOfferDetail)
+    }
     setBtnUpload(false)
   }
 
   const handleEdit = (item) => {
-    console.log({ item })
     editForm.setFieldsValue({ ...item })
     setDiscountType(item.discountType)
     setDiscount(item.discount ?? "")
@@ -600,6 +615,39 @@ const Products = () => {
       disPrice = locOriginialPrice - price
     }
     disPrice = disPrice.toFixed(2)
+    setDiscountedPrice(disPrice)
+  }
+
+  const handleAddProductDiscount = (value, locDiscType) => {
+    setDiscount(value)
+    if (!locDiscType) {
+      locDiscType = discountType
+    }
+    value = form.getFieldValue("discount") ?? 0
+    const locOriginialPrice = form.getFieldValue("originalPrice")
+    if (!locOriginialPrice || locOriginialPrice === "") {
+      message.warn({
+        content: "Please add Price first!",
+        key: "price_add_first",
+      })
+      setDiscount("")
+      return
+    }
+    // setDiscountType(locDiscType)
+    let price
+    let disPrice
+    if (value) {
+      if (locDiscType === "£") {
+        disPrice = locOriginialPrice - value
+      }
+      if (locDiscType === "%") {
+        price = (locOriginialPrice / 100) * value
+        disPrice = locOriginialPrice - price
+      }
+      disPrice = +disPrice?.toFixed(2)
+    } else {
+      disPrice = form.getFieldValue("originalPrice")
+    }
     setDiscountedPrice(disPrice)
   }
   function containsWhitespace(str) {
@@ -657,34 +705,35 @@ const Products = () => {
 
   return (
     <>
-      <Container>
-        <Tabs animated activeKey={key}>
-          <TabPane key="1">
-            <Row>
-              <Col>
-                <Button
-                  type="primary"
-                  className="btnPrimary"
-                  icon={<PlusOutlined />}
-                  loading={isLoading}
-                  onClick={() => setShow(true)}
-                  size="large"
-                >
-                  Add Product
-                </Button>
-              </Col>
-            </Row>
-            <Row className="my-2">
-              <Col className="d-flex justify-content-center">
-                <Tag
-                  className="my-2 rounded-pill font18 px-3 py-2"
-                  color="blue"
-                >
-                  Total Products: {search ? search.length : 0}
-                </Tag>
-              </Col>
-            </Row>
-            {/* <Row className="mb-2 d-flex justify-content-end mb-3">
+      <Spin spinning={isLoading}>
+        <Container>
+          <Tabs animated activeKey={key}>
+            <TabPane key="1">
+              <Row>
+                <Col>
+                  <Button
+                    type="primary"
+                    className="btnPrimary"
+                    icon={<PlusOutlined />}
+                    loading={isLoading}
+                    onClick={() => setShow(true)}
+                    size="large"
+                  >
+                    Add Product
+                  </Button>
+                </Col>
+              </Row>
+              <Row className="my-2">
+                <Col className="d-flex justify-content-center">
+                  <Tag
+                    className="my-2 rounded-pill font18 px-3 py-2"
+                    color="blue"
+                  >
+                    Total Products: {search ? search.length : 0}
+                  </Tag>
+                </Col>
+              </Row>
+              {/* <Row className="mb-2 d-flex justify-content-end mb-3">
               <Col md={4} className="d-flex">
                 <Input
                   type="text"
@@ -693,945 +742,980 @@ const Products = () => {
                 />
               </Col>
             </Row> */}
-            <Row>
-              <Col>
-                <Table
-                  bordered
-                  dataSource={search}
-                  columns={columns}
-                  scroll={{ x: true }}
-                  loading={isLoading}
-                  pagination={{
-                    position: ["bottomCenter"],
-                    showSizeChanger: true,
-                  }}
-                  rowKey={(item) => item.id}
-                  expandable={{
-                    expandedRowRender: (item) => {
-                      return (
-                        <div>
-                          <Row>
-                            <Col>
-                              <Space direction="vertical" wrap>
-                                <strong>Product ID</strong>
-                                <p>{item?.id ?? ""}</p>
-                                <strong>Description:</strong>
-                                <p style={{ margin: 0, textAlign: "justify" }}>
-                                  {item.description}
-                                </p>
-                              </Space>
-                            </Col>
-                          </Row>
-                        </div>
-                      )
-                    },
-                  }}
-                />
-              </Col>
-            </Row>
-          </TabPane>
-          <TabPane key="2">
-            <Card className="rounded">
-              <Row className="mb-2">
+              <Row>
                 <Col>
+                  <Table
+                    bordered
+                    dataSource={search}
+                    columns={columns}
+                    scroll={{ x: true }}
+                    loading={isLoading}
+                    pagination={{
+                      position: ["bottomCenter"],
+                      showSizeChanger: true,
+                    }}
+                    rowKey={(item) => item.id}
+                    expandable={{
+                      expandedRowRender: (item) => {
+                        return (
+                          <div>
+                            <Row>
+                              <Col>
+                                <Space direction="vertical" wrap>
+                                  <strong>Product ID</strong>
+                                  <p>{item?.id ?? ""}</p>
+                                  <strong>Description:</strong>
+                                  <p
+                                    style={{ margin: 0, textAlign: "justify" }}
+                                  >
+                                    {item.description}
+                                  </p>
+                                </Space>
+                              </Col>
+                            </Row>
+                          </div>
+                        )
+                      },
+                    }}
+                  />
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane key="2">
+              <Card className="rounded">
+                <Row className="mb-2">
+                  <Col>
+                    <Button
+                      onClick={handleBack}
+                      className="btnSecondary"
+                      type="primary"
+                    >
+                      <i className="fa fa-arrow-left me-1"> </i>Back
+                    </Button>
+                  </Col>
+                </Row>
+                {edit && (
+                  <Form
+                    size="large"
+                    form={editForm}
+                    layout="vertical"
+                    onFinish={handleEditProduct}
+                  >
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Name"
+                          name="name"
+                          rules={[
+                            { required: true, message: "Please enter title!" },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Input type="text" />
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Description"
+                          name="description"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter description!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Input.TextArea />
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={4}>
+                        <Item
+                          name="originalPrice"
+                          label="Original Price"
+                          className="fw-bold"
+                          rules={[
+                            { required: true, message: "Please enter price!" },
+                          ]}
+                        >
+                          <Input
+                            onChange={(e) => {
+                              handleDiscount(discount)
+                            }}
+                            prefix={<PoundCircleFilled />}
+                            type="number"
+                          />
+                        </Item>
+                      </Col>
+                      <Col md={4}>
+                        <Item
+                          label={
+                            <>
+                              <div>
+                                Discount (optional)
+                                <div>
+                                  <Radio.Group
+                                    onChange={(e) => {
+                                      const locOriginalPrice =
+                                        editForm.getFieldValue("originalPrice")
+                                      if (locOriginalPrice) {
+                                        setDiscountType(e.target.value)
+                                        handleDiscount(discount, e.target.value)
+                                      } else {
+                                        if (
+                                          !locOriginalPrice ||
+                                          locOriginalPrice === ""
+                                        ) {
+                                          message.warn({
+                                            content: "Please add Price first!",
+                                            key: "price_add_first",
+                                          })
+                                          setDiscount("")
+                                          return
+                                        }
+                                      }
+                                    }}
+                                    value={discountType}
+                                  >
+                                    <Radio title="Flat Discount" value="£">
+                                      £
+                                    </Radio>
+                                    <Radio
+                                      title="Percentage Discount"
+                                      value="%"
+                                    >
+                                      %
+                                    </Radio>
+                                  </Radio.Group>
+                                </div>
+                              </div>
+                            </>
+                          }
+                          name="discount"
+                          className="fw-bold"
+                        >
+                          <Input
+                            name="discount"
+                            onChange={(e) => {
+                              handleDiscount(e.target.value)
+                            }}
+                            min={0}
+                            max={
+                              discountType === "%"
+                                ? 70
+                                : +editForm.getFieldValue("originalPrice")
+                            }
+                            // value={discount}
+                            disabled={
+                              !editForm.getFieldValue("originalPrice") ||
+                              !discountType
+                            }
+                            prefix={discountType}
+                            type="number"
+                          />
+                        </Item>
+                        <span>
+                          <strong>
+                            Discounted Price:{" "}
+                            <span className="text-primary">
+                              {" "}
+                              {discountType} {discountedPrice}
+                            </span>
+                          </strong>
+                        </span>
+                      </Col>
+                      <Col md={4}>
+                        <Item
+                          name="stock"
+                          label="Stock"
+                          className="fw-bold"
+                          rules={[
+                            { required: true, message: "Please enter stock!" },
+                          ]}
+                        >
+                          <Input
+                            // onChange={(e) => setOriginalPrice(e.target.value)}
+                            // prefix={<PoundCircleFilled />}
+                            type="number"
+                          />
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Category"
+                          name="category"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select category!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            clearIcon
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
+                            maxTagCount={1}
+                            placeholder="Select Category"
+                            onSearch={(val) => setCatSearch(val.trim())}
+                            notFoundContent={
+                              <div
+                                onClick={handleAddCategory}
+                                title={`Add ${catSearch} to categories`}
+                                style={{ cursor: "pointer", color: "black" }}
+                              >
+                                <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                                <span className="me-2">Add</span>
+                                <span
+                                  className="px-2"
+                                  style={{ backgroundColor: "#F0F2F5" }}
+                                >
+                                  {catSearch}
+                                </span>
+                              </div>
+                            }
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {categ &&
+                              categ?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Colors"
+                          name="colors"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select product colors!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            mode="multiple"
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
+                            // maxTagCount={3}
+                            placeholder="Select Colors"
+                            onSearch={(val) => setColorSearch(val.trim())}
+                            notFoundContent={
+                              <div
+                                onClick={handleAddColor}
+                                title={`Add ${colorSearch} to Colors`}
+                                style={{ cursor: "pointer", color: "black" }}
+                              >
+                                <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                                <span className="me-2">Add</span>
+                                <span
+                                  className="px-2"
+                                  style={{ backgroundColor: "#F0F2F5" }}
+                                >
+                                  {colorSearch}
+                                </span>
+                              </div>
+                            }
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {colors &&
+                              colors?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Stitched"
+                          name="is_stitched"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select stitched!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            placeholder="Select Stitched"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            <Option value={"yes"}>Yes</Option>
+                            <Option value={"no"}>No</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="Cloth Types"
+                          name="cloth_type"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select cloth type!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            maxTagCount={1}
+                            clearIcon
+                            placeholder="Select Cloth Type"
+                            onSearch={(val) => setClothTypeSearch(val.trim())}
+                            notFoundContent={
+                              <div
+                                onClick={handleAddClothType}
+                                title={`Add ${clothTypeSearch} to Cloth Types`}
+                                style={{ cursor: "pointer", color: "black" }}
+                              >
+                                <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                                <span className="me-2">Add</span>
+                                <span
+                                  className="px-2"
+                                  style={{ backgroundColor: "#F0F2F5" }}
+                                >
+                                  {clothTypeSearch}
+                                </span>
+                              </div>
+                            }
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {clothTypes &&
+                              clothTypes?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Brand"
+                          name="brand"
+                          rules={[
+                            { required: true, message: "Please select brand!" },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            maxTagCount={1}
+                            clearIcon
+                            placeholder="Select Brand"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            {brands &&
+                              brands?.map((item) => {
+                                return (
+                                  <Option value={item.id}>{item.name}</Option>
+                                )
+                              })}
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="New Product"
+                          name={"is-new-product"}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select an option!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            placeholder="New Product"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            <Option value={true}>Yes</Option>
+                            <Option value={false}>No</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Sizes"
+                          name="sizes"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select size!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            showSearch
+                            mode="multiple"
+                            clearIcon
+                            placeholder="Select Sizes"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                          >
+                            <Option value={"xs"}>XS</Option>
+                            <Option value={"s"}>S</Option>
+                            <Option value={"m"}>M</Option>
+                            <Option value={"l"}>L</Option>
+                            <Option value={"xl"}>XL</Option>
+                            <Option value={"xxl"}>XXL</Option>
+                            <Option value={"xxxl"}>XXXL</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Col md={6}>
+                        <Item
+                          label="New Image(s)"
+                          name="image"
+                          // rules={[
+                          //   { required: true, message: 'Please select images!' },
+                          // ]}
+                          className="fw-bold"
+                        >
+                          <Upload
+                            accept="image/*"
+                            customRequest={dummyRequest}
+                            onRemove={() => {
+                              setFileName("")
+                            }}
+                            listType="picture"
+                            multiple
+                          >
+                            <Button icon={<UploadOutlined />}>
+                              Click to Upload
+                            </Button>
+                          </Upload>
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <Item label="Product Images" className="fw-bold d-flex">
+                          {edit &&
+                            edit?.image?.map((item, index) => (
+                              <div className="position-relative d-flex mt-2">
+                                <div>
+                                  {index != 0 && (
+                                    <i
+                                      className="fas fa-trash fs-5"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={(e) => {
+                                        let arr = [...productDetails?.image]
+                                        arr?.splice(index, 1)
+                                        setEdit((prev) => ({
+                                          ...prev,
+                                          image: [...arr],
+                                        }))
+                                      }}
+                                    ></i>
+                                  )}
+                                  <Avatar
+                                    size={80}
+                                    style={{ cursor: "pointer" }}
+                                    key={item}
+                                    className="me-2"
+                                    shape="square"
+                                    src={<Image src={item} preview={true} />}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                        </Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="d-flex justify-content-end">
+                        {showPopConfirm === false && (
+                          <Button
+                            loading={btnUpload}
+                            className="btnPrimary"
+                            htmlType="submit"
+                            type="primary"
+                          >
+                            Update
+                          </Button>
+                        )}
+                        {showPopConfirm === true && (
+                          <Popconfirm
+                            title="This product is listed in special offer. If you remove the discount, this product will be removed from the special offer products. Do you wish to continue?"
+                            // description=""
+                            placement="topLeft"
+                            onConfirm={() =>
+                              handleEditProduct(editForm.getFieldsValue())
+                            }
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button
+                              loading={btnUpload}
+                              className="btnPrimary"
+                              htmlType="submit"
+                              type="primary"
+                            >
+                              Update
+                            </Button>
+                          </Popconfirm>
+                        )}
+                      </Col>
+                    </Row>
+                  </Form>
+                )}
+              </Card>
+            </TabPane>
+          </Tabs>
+          <BackTop>
+            <div style={backToTop}>
+              <i className="fas fa-arrow-up"></i>
+            </div>
+          </BackTop>
+          {/* add new product */}
+          <Modal
+            title="Add Product"
+            visible={show}
+            footer={false}
+            onCancel={handleModalClose}
+            width="900px"
+          >
+            <Form
+              size="large"
+              form={form}
+              layout="vertical"
+              onFinish={handleAddProduct}
+            >
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Name"
+                    name="name"
+                    rules={[{ required: true, message: "Please enter title!" }]}
+                    className="fw-bold"
+                  >
+                    <Input type="text" />
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Description"
+                    name="description"
+                    rules={[
+                      { required: true, message: "Please enter description!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Input.TextArea />
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Stock"
+                    name="stock"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter stock!",
+                      },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Input
+                      // onChange={(e) => setOriginalPrice(e.target.value)}
+                      type="number"
+                    />
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    name="originalPrice"
+                    label="Original Price"
+                    className="fw-bold"
+                    rules={[{ required: true, message: "Please enter price!" }]}
+                  >
+                    <Input
+                      onChange={(e) => {
+                        handleAddProductDiscount(discount)
+                      }}
+                      prefix={<PoundCircleFilled />}
+                      type="number"
+                    />
+                  </Item>
+                </Col>
+                <Col>
+                  <Item
+                    label={
+                      <>
+                        <div>
+                          Discount (optional)
+                          <div>
+                            <Radio.Group
+                              onChange={(e) => {
+                                const locOriginalPrice =
+                                  form.getFieldValue("originalPrice")
+                                if (locOriginalPrice) {
+                                  setDiscountType(e.target.value)
+                                  handleAddProductDiscount(
+                                    discount,
+                                    e.target.value
+                                  )
+                                } else {
+                                  if (
+                                    !locOriginalPrice ||
+                                    locOriginalPrice === ""
+                                  ) {
+                                    message.warn({
+                                      content: "Please add Price first!",
+                                      key: "price_add_first",
+                                    })
+                                    setDiscount("")
+                                    return
+                                  }
+                                }
+                              }}
+                              value={discountType}
+                            >
+                              <Radio title="Flat Discount" value="£">
+                                £
+                              </Radio>
+                              <Radio title="Percentage Discount" value="%">
+                                %
+                              </Radio>
+                            </Radio.Group>
+                          </div>
+                        </div>
+                      </>
+                    }
+                    name="discount"
+                    className="fw-bold"
+                  >
+                    <Input
+                      name="discount"
+                      onChange={(e) => handleAddProductDiscount(e.target.value)}
+                      min={0}
+                      max={
+                        discountType === "%"
+                          ? 70
+                          : form.getFieldValue("originalPrice")
+                      }
+                      // value={discount}
+                      disabled={!discountType}
+                      prefix={discountType}
+                      type="number"
+                    />
+                  </Item>
+                  <span>
+                    <strong>
+                      Discounted Price:{" "}
+                      <span className="text-primary">
+                        {" "}
+                        {discountType}{" "}
+                        {form.getFieldValue("discount")
+                          ? discountedPrice
+                          : form.getFieldValue("originalPrice")}
+                      </span>
+                    </strong>
+                  </span>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Category"
+                    name="category"
+                    rules={[
+                      { required: true, message: "Please select category!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      clearIcon
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      maxTagCount={1}
+                      placeholder="Select Category"
+                      onSearch={(val) => setCatSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddCategory}
+                          title={`Add ${catSearch} to categories`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {catSearch}
+                          </span>
+                        </div>
+                      }
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {categ &&
+                        categ?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Colors"
+                    name="colors"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select product colors!",
+                      },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      mode="multiple"
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      // maxTagCount={3}
+                      placeholder="Select Colors"
+                      onSearch={(val) => setColorSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddColor}
+                          title={`Add ${colorSearch} to Colors`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {colorSearch}
+                          </span>
+                        </div>
+                      }
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {colors &&
+                        colors?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Stitched"
+                    name="is_stitched"
+                    rules={[
+                      { required: true, message: "Please select stitched!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      placeholder="Select Stitched"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      <Option value={"yes"}>Yes</Option>
+                      <Option value={"no"}>No</Option>
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Cloth Types"
+                    name="cloth_type"
+                    rules={[
+                      { required: true, message: "Please select cloth type!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      maxTagCount={1}
+                      clearIcon
+                      placeholder="Select Cloth Type"
+                      onSearch={(val) => setClothTypeSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddClothType}
+                          title={`Add ${clothTypeSearch} to Cloth Types`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {clothTypeSearch}
+                          </span>
+                        </div>
+                      }
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {clothTypes &&
+                        clothTypes?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Brand"
+                    name="brand"
+                    rules={[
+                      { required: true, message: "Please select brand!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      maxTagCount={1}
+                      clearIcon
+                      placeholder="Select Brand"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      {brands &&
+                        brands?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="New Product"
+                    name={"is-new-product"}
+                    rules={[
+                      { required: true, message: "Please check this field!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      placeholder="Select Stitched"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      <Option value={"yes"}>Yes</Option>
+                      <Option value={"no"}>No</Option>
+                    </Select>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Item
+                    label="Sizes"
+                    name="sizes"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select cloth type!",
+                      },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      showSearch
+                      mode="multiple"
+                      clearIcon
+                      placeholder="Select Sizes"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                    >
+                      <Option value={"xs"}>XS</Option>
+                      <Option value={"s"}>S</Option>
+                      <Option value={"m"}>M</Option>
+                      <Option value={"L"}>L</Option>
+                      <Option value={"XL"}>XL</Option>
+                      <Option value={"XXl"}>XXL</Option>
+                      <Option value={"XXXL"}>XXXL</Option>
+                    </Select>
+                  </Item>
+                </Col>
+                <Col md={6}>
+                  <Item
+                    label="Image"
+                    name="image"
+                    rules={[
+                      { required: true, message: "Please select images!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Upload
+                      accept="image/*"
+                      customRequest={dummyRequest}
+                      onRemove={() => {
+                        setFileName("")
+                      }}
+                      listType="picture"
+                      multiple
+                    >
+                      <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                    </Upload>
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="d-flex justify-content-end">
                   <Button
-                    onClick={handleBack}
-                    className="btnSecondary"
+                    loading={btnUpload}
+                    className="btnPrimary"
+                    htmlType="submit"
                     type="primary"
                   >
-                    <i className="fa fa-arrow-left me-1"> </i>Back
+                    Post Product
                   </Button>
                 </Col>
               </Row>
-              {edit && (
-                <Form
-                  size="large"
-                  form={editForm}
-                  layout="vertical"
-                  onFinish={handleEditProduct}
-                >
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Name"
-                        name="name"
-                        rules={[
-                          { required: true, message: "Please enter title!" },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Input type="text" />
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Description"
-                        name="description"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter description!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Input.TextArea />
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={4}>
-                      <Item
-                        name="originalPrice"
-                        label="Original Price"
-                        className="fw-bold"
-                        rules={[
-                          { required: true, message: "Please enter price!" },
-                        ]}
-                      >
-                        <Input
-                          onChange={(e) => {
-                            handleDiscount(discount)
-                          }}
-                          prefix={<PoundCircleFilled />}
-                          type="number"
-                        />
-                      </Item>
-                    </Col>
-                    <Col md={4}>
-                      <Item
-                        label={
-                          <>
-                            <div>
-                              Discount (optional)
-                              <div>
-                                <Radio.Group
-                                  onChange={(e) => {
-                                    const locOriginalPrice =
-                                      editForm.getFieldValue("originalPrice")
-                                    if (locOriginalPrice) {
-                                      setDiscountType(e.target.value)
-                                      handleDiscount(discount, e.target.value)
-                                    } else {
-                                      if (
-                                        !locOriginalPrice ||
-                                        locOriginalPrice === ""
-                                      ) {
-                                        message.warn({
-                                          content: "Please add Price first!",
-                                          key: "price_add_first",
-                                        })
-                                        setDiscount("")
-                                        return
-                                      }
-                                    }
-                                  }}
-                                  value={discountType}
-                                >
-                                  <Radio title="Flat Discount" value="£">
-                                    £
-                                  </Radio>
-                                  <Radio title="Percentage Discount" value="%">
-                                    %
-                                  </Radio>
-                                </Radio.Group>
-                              </div>
-                            </div>
-                          </>
-                        }
-                        name="discount"
-                        className="fw-bold"
-                      >
-                        <Input
-                          name="discount"
-                          onChange={(e) => {
-                            handleDiscount(e.target.value)
-                          }}
-                          min={0}
-                          max={
-                            discountType === "%"
-                              ? 70
-                              : +editForm.getFieldValue("originalPrice")
-                          }
-                          // value={discount}
-                          disabled={!editForm.getFieldValue("originalPrice")}
-                          prefix={discountType}
-                          type="number"
-                        />
-                      </Item>
-                      <span>
-                        <strong>
-                          Discounted Price:{" "}
-                          <span className="text-primary">
-                            {" "}
-                            £ {discountedPrice}
-                          </span>
-                        </strong>
-                      </span>
-                    </Col>
-                    <Col md={4}>
-                      <Item
-                        name="stock"
-                        label="Stock"
-                        className="fw-bold"
-                        rules={[
-                          { required: true, message: "Please enter stock!" },
-                        ]}
-                      >
-                        <Input
-                          // onChange={(e) => setOriginalPrice(e.target.value)}
-                          prefix={<PoundCircleFilled />}
-                          type="number"
-                        />
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Category"
-                        name="category"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select category!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          clearIcon
-                          filterOption={(input, option) =>
-                            option.children
-                              .toLowerCase()
-                              .indexOf(input.toLowerCase()) >= 0
-                          }
-                          maxTagCount={1}
-                          placeholder="Select Category"
-                          onSearch={(val) => setCatSearch(val.trim())}
-                          notFoundContent={
-                            <div
-                              onClick={handleAddCategory}
-                              title={`Add ${catSearch} to categories`}
-                              style={{ cursor: "pointer", color: "black" }}
-                            >
-                              <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                              <span className="me-2">Add</span>
-                              <span
-                                className="px-2"
-                                style={{ backgroundColor: "#F0F2F5" }}
-                              >
-                                {catSearch}
-                              </span>
-                            </div>
-                          }
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {categ &&
-                            categ?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Colors"
-                        name="colors"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select product colors!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          mode="multiple"
-                          optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            option.children
-                              .toLowerCase()
-                              .indexOf(input.toLowerCase()) >= 0
-                          }
-                          // maxTagCount={3}
-                          placeholder="Select Colors"
-                          onSearch={(val) => setColorSearch(val.trim())}
-                          notFoundContent={
-                            <div
-                              onClick={handleAddColor}
-                              title={`Add ${colorSearch} to Colors`}
-                              style={{ cursor: "pointer", color: "black" }}
-                            >
-                              <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                              <span className="me-2">Add</span>
-                              <span
-                                className="px-2"
-                                style={{ backgroundColor: "#F0F2F5" }}
-                              >
-                                {colorSearch}
-                              </span>
-                            </div>
-                          }
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {colors &&
-                            colors?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Stitched"
-                        name="is_stitched"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select stitched!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          placeholder="Select Stitched"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          <Option value={"yes"}>Yes</Option>
-                          <Option value={"no"}>No</Option>
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="Cloth Types"
-                        name="cloth_type"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select cloth type!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          maxTagCount={1}
-                          clearIcon
-                          placeholder="Select Cloth Type"
-                          onSearch={(val) => setClothTypeSearch(val.trim())}
-                          notFoundContent={
-                            <div
-                              onClick={handleAddClothType}
-                              title={`Add ${clothTypeSearch} to Cloth Types`}
-                              style={{ cursor: "pointer", color: "black" }}
-                            >
-                              <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                              <span className="me-2">Add</span>
-                              <span
-                                className="px-2"
-                                style={{ backgroundColor: "#F0F2F5" }}
-                              >
-                                {clothTypeSearch}
-                              </span>
-                            </div>
-                          }
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {clothTypes &&
-                            clothTypes?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Brand"
-                        name="brand"
-                        rules={[
-                          { required: true, message: "Please select brand!" },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          maxTagCount={1}
-                          clearIcon
-                          placeholder="Select Brand"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          {brands &&
-                            brands?.map((item) => {
-                              return (
-                                <Option value={item.id}>{item.name}</Option>
-                              )
-                            })}
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="New Product"
-                        name={"is-new-product"}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select an option!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          placeholder="New Product"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          <Option value={true}>Yes</Option>
-                          <Option value={false}>No</Option>
-                        </Select>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={6}>
-                      <Item
-                        label="Sizes"
-                        name="sizes"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please select size!",
-                          },
-                        ]}
-                        className="fw-bold"
-                      >
-                        <Select
-                          showSearch
-                          mode="multiple"
-                          clearIcon
-                          placeholder="Select Sizes"
-                          style={{ fontSize: 13, fontWeight: 300 }}
-                        >
-                          <Option value={"xs"}>XS</Option>
-                          <Option value={"s"}>S</Option>
-                          <Option value={"m"}>M</Option>
-                          <Option value={"l"}>L</Option>
-                          <Option value={"xl"}>XL</Option>
-                          <Option value={"xxl"}>XXL</Option>
-                          <Option value={"xxxl"}>XXXL</Option>
-                        </Select>
-                      </Item>
-                    </Col>
-                    <Col md={6}>
-                      <Item
-                        label="New Image(s)"
-                        name="image"
-                        // rules={[
-                        //   { required: true, message: 'Please select images!' },
-                        // ]}
-                        className="fw-bold"
-                      >
-                        <Upload
-                          accept="image/*"
-                          customRequest={dummyRequest}
-                          onRemove={() => {
-                            setFileName("")
-                          }}
-                          listType="picture"
-                          multiple
-                        >
-                          <Button icon={<UploadOutlined />}>
-                            Click to Upload
-                          </Button>
-                        </Upload>
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <Item label="Product Images" className="fw-bold d-flex">
-                        {edit &&
-                          edit?.image?.map((item, index) => (
-                            <div className="position-relative d-flex">
-                              <div>
-                                <i
-                                  className="fas fa-trash fs-5"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={(e) => {
-                                    let arr = [...productDetails?.image]
-                                    arr?.splice(index, 1)
-                                    setEdit((prev) => ({
-                                      ...prev,
-                                      image: [...arr],
-                                    }))
-                                  }}
-                                ></i>
-                                <Avatar
-                                  size={80}
-                                  style={{ cursor: "pointer" }}
-                                  key={item}
-                                  className="me-2"
-                                  shape="square"
-                                  src={<Image src={item} preview={true} />}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                      </Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="d-flex justify-content-end">
-                      <Button
-                        loading={btnUpload}
-                        className="btnPrimary"
-                        htmlType="submit"
-                        type="primary"
-                      >
-                        Update
-                      </Button>
-                    </Col>
-                  </Row>
-                </Form>
-              )}
-            </Card>
-          </TabPane>
-        </Tabs>
-        <BackTop>
-          <div style={backToTop}>
-            <i className="fas fa-arrow-up"></i>
-          </div>
-        </BackTop>
-        {/* add new product */}
-        <Modal
-          title="Add Product"
-          visible={show}
-          footer={false}
-          onCancel={handleModalClose}
-          width="900px"
-        >
-          <Form
-            size="large"
-            form={form}
-            layout="vertical"
-            onFinish={handleAddProduct}
-          >
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Name"
-                  name="name"
-                  rules={[{ required: true, message: "Please enter title!" }]}
-                  className="fw-bold"
-                >
-                  <Input type="text" />
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Description"
-                  name="description"
-                  rules={[
-                    { required: true, message: "Please enter description!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Input.TextArea />
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Stock"
-                  name="stock"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter available stock!",
-                    },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Input
-                    onChange={(e) => setOriginalPrice(e.target.value)}
-                    type="number"
-                  />
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  name="price"
-                  label="Price"
-                  className="fw-bold"
-                  rules={[{ required: true, message: "Please enter price!" }]}
-                >
-                  <Input
-                    onChange={(e) => setOriginalPrice(e.target.value)}
-                    prefix={<PoundCircleFilled />}
-                    type="number"
-                  />
-                </Item>
-              </Col>
-              <Col>
-                <Item
-                  label={
-                    <>
-                      <div>
-                        Discount (optional)
-                        <div>
-                          <Radio.Group
-                            onChange={(e) => {
-                              setDiscountType(e.target.value)
-                              handleDiscount(0)
-                            }}
-                            value={discountType}
-                          >
-                            <Radio title="Flat Discount" value="£">
-                              £
-                            </Radio>
-                            <Radio title="Percentage Discount" value="%">
-                              %
-                            </Radio>
-                          </Radio.Group>
-                        </div>
-                      </div>
-                    </>
-                  }
-                  className="fw-bold"
-                >
-                  <Input
-                    name="discount"
-                    onChange={(e) => handleDiscount(e.target.value)}
-                    min={0}
-                    max={
-                      discountType === "%" ? 90 : form.getFieldValue("price")
-                    }
-                    value={discount}
-                    prefix={discountType}
-                    type="number"
-                  />
-                </Item>
-                <span>
-                  <strong>
-                    Discounted Price:{" "}
-                    <span className="text-primary">
-                      {" "}
-                      {discountType} {discountedPrice}
-                    </span>
-                  </strong>
-                </span>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Category"
-                  name="category"
-                  rules={[
-                    { required: true, message: "Please select category!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    clearIcon
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    maxTagCount={1}
-                    placeholder="Select Category"
-                    onSearch={(val) => setCatSearch(val.trim())}
-                    notFoundContent={
-                      <div
-                        onClick={handleAddCategory}
-                        title={`Add ${catSearch} to categories`}
-                        style={{ cursor: "pointer", color: "black" }}
-                      >
-                        <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                        <span className="me-2">Add</span>
-                        <span
-                          className="px-2"
-                          style={{ backgroundColor: "#F0F2F5" }}
-                        >
-                          {catSearch}
-                        </span>
-                      </div>
-                    }
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {categ &&
-                      categ?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Colors"
-                  name="colors"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select product colors!",
-                    },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    mode="multiple"
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    // maxTagCount={3}
-                    placeholder="Select Colors"
-                    onSearch={(val) => setColorSearch(val.trim())}
-                    notFoundContent={
-                      <div
-                        onClick={handleAddColor}
-                        title={`Add ${colorSearch} to Colors`}
-                        style={{ cursor: "pointer", color: "black" }}
-                      >
-                        <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                        <span className="me-2">Add</span>
-                        <span
-                          className="px-2"
-                          style={{ backgroundColor: "#F0F2F5" }}
-                        >
-                          {colorSearch}
-                        </span>
-                      </div>
-                    }
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {colors &&
-                      colors?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Stitched"
-                  name="is_stitched"
-                  rules={[
-                    { required: true, message: "Please select stitched!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    placeholder="Select Stitched"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    <Option value={"yes"}>Yes</Option>
-                    <Option value={"no"}>No</Option>
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Cloth Types"
-                  name="cloth_type"
-                  rules={[
-                    { required: true, message: "Please select cloth type!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    maxTagCount={1}
-                    clearIcon
-                    placeholder="Select Cloth Type"
-                    onSearch={(val) => setClothTypeSearch(val.trim())}
-                    notFoundContent={
-                      <div
-                        onClick={handleAddClothType}
-                        title={`Add ${clothTypeSearch} to Cloth Types`}
-                        style={{ cursor: "pointer", color: "black" }}
-                      >
-                        <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                        <span className="me-2">Add</span>
-                        <span
-                          className="px-2"
-                          style={{ backgroundColor: "#F0F2F5" }}
-                        >
-                          {clothTypeSearch}
-                        </span>
-                      </div>
-                    }
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {clothTypes &&
-                      clothTypes?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Brand"
-                  name="brand"
-                  rules={[{ required: true, message: "Please select brand!" }]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    maxTagCount={1}
-                    clearIcon
-                    placeholder="Select Brand"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    {brands &&
-                      brands?.map((item) => {
-                        return <Option value={item.id}>{item.name}</Option>
-                      })}
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="New Product"
-                  name={"is-new-product"}
-                  rules={[
-                    { required: true, message: "Please check this field!" },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    placeholder="Select Stitched"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    <Option value={"yes"}>Yes</Option>
-                    <Option value={"no"}>No</Option>
-                  </Select>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Item
-                  label="Sizes"
-                  name="sizes"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select cloth type!",
-                    },
-                  ]}
-                  className="fw-bold"
-                >
-                  <Select
-                    showSearch
-                    mode="multiple"
-                    clearIcon
-                    placeholder="Select Sizes"
-                    style={{ fontSize: 13, fontWeight: 300 }}
-                  >
-                    <Option value={"xs"}>XS</Option>
-                    <Option value={"s"}>S</Option>
-                    <Option value={"m"}>M</Option>
-                    <Option value={"L"}>L</Option>
-                    <Option value={"XL"}>XL</Option>
-                    <Option value={"XXl"}>XXL</Option>
-                    <Option value={"XXXL"}>XXXL</Option>
-                  </Select>
-                </Item>
-              </Col>
-              <Col md={6}>
-                <Item
-                  label="Image"
-                  name="image"
-                  rules={[{ required: true, message: "Please select images!" }]}
-                  className="fw-bold"
-                >
-                  <Upload
-                    accept="image/*"
-                    customRequest={dummyRequest}
-                    onRemove={() => {
-                      setFileName("")
-                    }}
-                    listType="picture"
-                    multiple
-                  >
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                  </Upload>
-                </Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col className="d-flex justify-content-end">
-                <Button
-                  loading={btnUpload}
-                  className="btnPrimary"
-                  htmlType="submit"
-                  type="primary"
-                >
-                  Post Product
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-        </Modal>
-      </Container>
-      {/* {beforeUpload && (
-        <Modal
-          title="Change Image Name"
-          visible={fileModal}
-          onCancel={() => setFileModal(false)}
-          footer={null}
-        >
-          {beforeUpload.image.fileList?.map((item, idx) => (
-            <div>
-              <div className="d-flex justify-content-center">
-                <Image
-                  preview={false}
-                  src={item.thumbUrl}
-                  alt={item.name}
-                  width="100px"
-                  height="100px"
-                />
-              </div>
-              <Input
-                defaultValue={item.name}
-                onChange={(e) => handleChangeFileName(e.target.value, idx)}
-              />
-            </div>
-          ))}
-          <div className="d-flex justify-content-end mt-3">
-            <Button onClick={handleOkFileModal} type="primary">
-              Save
-            </Button>
-          </div>
-        </Modal>
-      )} */}
+            </Form>
+          </Modal>
+        </Container>
+      </Spin>
     </>
   )
 }

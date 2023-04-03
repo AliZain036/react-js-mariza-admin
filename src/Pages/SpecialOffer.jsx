@@ -21,11 +21,10 @@ const SpecialOffer = () => {
   const [isAddOfferModalOpen, setIsAddOfferModalOpen] = useState(false)
   const [addSpecialOfferForm] = Form.useForm()
   const [updateForm] = Form.useForm()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(null)
   const [products, setProducts] = useState([])
   useEffect(() => {
     fetchAllProducts()
-    fetchOfferDetail()
   }, [])
 
   const fetchOfferDetail = async () => {
@@ -35,11 +34,10 @@ const SpecialOffer = () => {
       setLoading(false)
       setOfferDetail(data[0])
       //   updateForm.setFields([{name: 'offer', value}])
-      console.log(data[0])
     } catch (error) {
       console.error(error)
     } finally {
-      setLoading(false)
+      // setLoading(false)
     }
   }
 
@@ -49,13 +47,13 @@ const SpecialOffer = () => {
       let response = await firebase
         .firestore()
         .collection("products")
-        .where("is_discounted", "==", false)
+        .where("is_valid_special_offer_product", "==", true)
         .get()
       let data = response.docs.map((doc) => {
         return { ...doc.data(), id: doc.id }
       })
       setProducts(data)
-      console.log({ data })
+      fetchOfferDetail()
     } catch (error) {
       console.error(error)
     } finally {
@@ -67,6 +65,7 @@ const SpecialOffer = () => {
     try {
       setLoading(true)
       let promises = []
+      let removedProductsUpdatePromises = []
       formValues?.products?.forEach((prodId) => {
         const productToUpdate = products.find((item) => item.id === prodId)
         const price =
@@ -77,6 +76,8 @@ const SpecialOffer = () => {
           discountType: "%",
           discount: formValues?.offer,
           is_discounted: true,
+          is_special_offer_product: true,
+          is_valid_special_offer_product: true,
         }
         const promise = firebase
           .firestore()
@@ -94,23 +95,45 @@ const SpecialOffer = () => {
         .then(() => {
           message.success("Special offer updated successfully!")
           setIsUpdateOfferModalOpen(false)
+          setIsAddOfferModalOpen(false)
           fetchOfferDetail()
+          setLoading(false)
+          const removedOfferProducts = offerDetail?.products?.filter((item) =>
+            formValues?.products?.find((id) => id != item.id) ? true : false
+          )
+          removedOfferProducts?.forEach((prodId) => {
+            const productToUpdate = products.find((item) => item.id === prodId)
+            // const price =
+            //   (+productToUpdate?.originalPrice / 100) * +formValues?.offer
+            // const disPrice = +productToUpdate?.originalPrice - price
+            const body = {
+              price: productToUpdate?.originalPrice,
+              // discountType: "",
+              discount: "",
+              is_discounted: false,
+              is_special_offer_product: false,
+              is_valid_special_offer_product: true,
+            }
+            const promise = firebase
+              .firestore()
+              .collection("products")
+              .doc(productToUpdate?.id)
+              .update(body)
+            removedProductsUpdatePromises.push(promise)
+          })
+          const removedProductsRes = Promise.all(removedProductsUpdatePromises)
         })
+      fetchAllProducts()
     } catch (error) {
       console.error(error)
-    } finally {
       setLoading(false)
+    } finally {
+      // setLoading(false)
     }
   }
 
-  console.log({ products, offerDetail })
-
   const handleAddSpecialOffer = async (formValues) => {
     try {
-      //   const filteredProducts = products.filter((product) =>
-      //     formValues.products.includes(product.id),
-      //   )
-      //   formValues.products = [...filteredProducts]
       setLoading(true)
       const result = await addDoc("specialOffer", formValues)
       if (result === true) {
@@ -118,6 +141,29 @@ const SpecialOffer = () => {
         setIsAddOfferModalOpen(false)
         fetchOfferDetail()
       }
+      const promises = []
+      formValues?.products?.forEach((prodId) => {
+        const productToUpdate = products.find((item) => item.id === prodId)
+        const price =
+          (+productToUpdate?.originalPrice / 100) * +formValues?.offer
+        const disPrice = +productToUpdate?.originalPrice - price
+        const body = {
+          price: disPrice,
+          discountType: "%",
+          discount: formValues?.offer,
+          is_discounted: true,
+          is_special_offer_product: true,
+          is_valid_special_offer_product: true,
+        }
+        const promise = firebase
+          .firestore()
+          .collection("products")
+          .doc(productToUpdate?.id)
+          .update(body)
+        promises.push(promise)
+      })
+      const allPromisesRes = await Promise.all(promises)
+      fetchAllProducts()
     } catch (error) {
       console.error(error)
     } finally {
@@ -135,7 +181,7 @@ const SpecialOffer = () => {
           <div className="mt-5 d-flex align-items-center gap-3">
             <h3 className="m-0">Special Offer</h3>
             <div className="d-flex align-items-center gap-2">
-              {offerDetail?.isActive === true && (
+              {offerDetail?.isActive === true && loading === false && (
                 <Button
                   className="btnPrimary"
                   htmlType="button"
@@ -145,7 +191,7 @@ const SpecialOffer = () => {
                   Update
                 </Button>
               )}
-              {!offerDetail?.isActive && (
+              {!offerDetail?.isActive && loading === false && (
                 <Button
                   className="btnPrimary"
                   htmlType="button"

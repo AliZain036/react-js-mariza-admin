@@ -145,15 +145,20 @@ const Orders = () => {
   }
   const columns = [
     {
-      title: "First Name",
+      title: "Name",
       dataIndex: "first_name",
       key: "first_name",
+      render: (firstName, record) => {
+        if (record?.email)
+          return <p>{record?.first_name + " " + record?.last_name}</p>
+        else return <p>{record?.session?.shipping_details?.name}</p>
+      },
     },
-    {
-      title: "Last Name",
-      dataIndex: "last_name",
-      key: "last_name",
-    },
+    // {
+    //   title: "Last Name",
+    //   dataIndex: "last_name",
+    //   key: "last_name",
+    // },
     {
       title: "Order Date",
       dataIndex: "orderDate",
@@ -168,6 +173,14 @@ const Orders = () => {
       title: "Address",
       dataIndex: "address",
       key: "address",
+      render: (address, record) => {
+        let locAddress = record?.session?.shipping_details?.address
+        if (record?.email) return <p>{address}</p>
+        else
+          return (
+            <p>{`${locAddress?.line1}, ${locAddress?.line2}, ${locAddress?.city}, ${locAddress?.state}, ${locAddress?.country}, ${locAddress?.postal_code}`}</p>
+          )
+      },
     },
     {
       title: "Total Amount",
@@ -338,6 +351,7 @@ const Orders = () => {
       return { ...doc.data(), id: doc.id }
     })
     if (data) {
+      console.log({ data })
       setOrders(data)
     }
   }
