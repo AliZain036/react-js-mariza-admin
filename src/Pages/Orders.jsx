@@ -171,11 +171,14 @@ const Orders = () => {
     },
     {
       title: "Address",
-      dataIndex: "address",
-      key: "address",
-      render: (address, record) => {
+      dataIndex: "shipping_details",
+      key: "shipping_details",
+      render: (shipping_details, record) => {
         let locAddress = record?.session?.shipping_details?.address
-        if (record?.email) return <p>{address}</p>
+        if (record?.email)
+          return (
+            <p>{`${shipping_details?.address_line_1}, ${shipping_details?.address_line_1}, ${shipping_details?.city}, ${shipping_details?.country}, ${shipping_details?.zip_code}`}</p>
+          )
         else
           return (
             <p>{`${locAddress?.line1}, ${locAddress?.line2}, ${locAddress?.city}, ${locAddress?.state}, ${locAddress?.country}, ${locAddress?.postal_code}`}</p>
