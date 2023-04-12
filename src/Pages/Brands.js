@@ -122,7 +122,6 @@ const Brands = () => {
       setIsLoading(false)
       getAllBrands()
     }
-    console.log(response)
   }
 
   const getAllBrands = async () => {
@@ -153,16 +152,16 @@ const Brands = () => {
     setBrandDetails(null)
     setIsLoading(true)
     let brand_primary_image_url = await singleImageUpload(
-      'brand-images',
-      values.primary_image.file.originFileObj,
+      "brand-images",
+      values.primary_image.file.originFileObj
     )
     const body = {
       name: values.name,
-      products: values?.products,
+      products: values?.products || [],
       primary_image: brand_primary_image_url,
       is_popular_brand: values.popularBrand,
     }
-    let response = await addDoc('brands', body)
+    let response = await addDoc("brands", body)
     if (response === true) {
       getAllBrands()
     }
@@ -173,28 +172,28 @@ const Brands = () => {
   const handleUpdateBrand = async (values) => {
     setIsLoading(true)
     let brand_primary_image_url
-    if (typeof values.primary_image !== 'string') {
+    if (typeof values.primary_image !== "string") {
       brand_primary_image_url = await singleImageUpload(
-        'brand-images',
-        values.primary_image.file.originFileObj,
+        "brand-images",
+        values.primary_image.file.originFileObj
       )
     }
-    const updateBrandProducts = updateBrandForm.getFieldValue('products')
+    const updateBrandProducts = updateBrandForm.getFieldValue("products")
     let prod = products?.filter(
       (prod) =>
-        prod.id === updateBrandProducts?.find((item) => item === prod.id),
+        prod.id === updateBrandProducts?.find((item) => item === prod.id)
     )
     let body = {
-      name: updateBrandForm.getFieldValue('name'),
+      name: updateBrandForm.getFieldValue("name"),
       products: prod,
       primary_image: brand_primary_image_url
         ? brand_primary_image_url
         : brandDetails?.primary_image,
-      is_popular_brand: updateBrandForm.getFieldValue('popularBrand'),
+      is_popular_brand: updateBrandForm.getFieldValue("popularBrand"),
     }
-    let result = await updateDoc('brands', brandDetails.id, body)
+    let result = await updateDoc("brands", brandDetails.id, body)
     if (result === true) {
-      message.success('Brand Updated Successfully!')
+      message.success("Brand Updated Successfully!")
       getAllBrands()
     }
     setIsLoading(false)
@@ -203,7 +202,7 @@ const Brands = () => {
 
   const dummyRequest = ({ file, onSuccess }) => {
     setTimeout(() => {
-      onSuccess('ok')
+      onSuccess("ok")
     }, 0)
   }
 
@@ -226,7 +225,7 @@ const Brands = () => {
           scroll={{ x: true }}
           loading={isLoading}
           pagination={{
-            position: ['bottomCenter'],
+            position: ["bottomCenter"],
             showSizeChanger: true,
           }}
           //   rowKey={(item) => item.id}
@@ -268,9 +267,9 @@ const Brands = () => {
           <div className="row">
             <div className="col-6">
               <Form.Item
-                name={'name'}
+                name={"name"}
                 rules={[
-                  { required: 'true', message: 'Brand name is required!' },
+                  { required: "true", message: "Brand name is required!" },
                 ]}
                 label="Name"
               >
@@ -279,8 +278,8 @@ const Brands = () => {
             </div>
             <div className="col-6">
               <Form.Item
-                name={'products'}
-                rules={[{ required: 'true', message: 'Please add products!' }]}
+                name={"products"}
+                // rules={[{ required: 'true', message: 'Please add products!' }]}
                 label="Products"
                 // initialValue={brandDetails?.products ?? []}
               >
@@ -311,13 +310,13 @@ const Brands = () => {
             <div className="col-12">
               <Form.Item
                 label="Popular Brand"
-                name={'popularBrand'}
-                rules={[{ required: true, message: 'This is required!' }]}
+                name={"popularBrand"}
+                rules={[{ required: true, message: "This is required!" }]}
                 className="fw-bold"
               >
                 <Select placeholder="Add to Popular Brands">
-                  <Select.Option value={'yes'}>Yes</Select.Option>
-                  <Select.Option value={'no'}>No</Select.Option>
+                  <Select.Option value={"yes"}>Yes</Select.Option>
+                  <Select.Option value={"no"}>No</Select.Option>
                 </Select>
               </Form.Item>
             </div>
@@ -325,11 +324,11 @@ const Brands = () => {
           <div className="row">
             <div className="col-12">
               <Form.Item
-                name={'primary_image'}
+                name={"primary_image"}
                 rules={[
                   {
-                    required: 'true',
-                    message: 'Please add brand primary image!',
+                    required: "true",
+                    message: "Please add brand primary image!",
                   },
                 ]}
                 label="Primary Image"
@@ -357,7 +356,7 @@ const Brands = () => {
               htmlType="submit"
               loading={isLoading}
               className="btnPrimary text-white cursor-pointer"
-              style={{ marginLeft: 'auto' }}
+              style={{ marginLeft: "auto" }}
             >
               Add
             </Button>
@@ -383,9 +382,9 @@ const Brands = () => {
           <div className="row">
             <div className="col-6">
               <Form.Item
-                name={'name'}
+                name={"name"}
                 rules={[
-                  { required: 'true', message: 'Brand name is required!' },
+                  { required: "true", message: "Brand name is required!" },
                 ]}
                 label="Name"
               >
@@ -394,8 +393,8 @@ const Brands = () => {
             </div>
             <div className="col-6">
               <Form.Item
-                name={'products'}
-                rules={[{ required: 'true', message: 'Please add products!' }]}
+                name={"products"}
+                // rules={[{ required: 'true', message: 'Please add products!' }]}
                 label="Products"
               >
                 <Select
@@ -430,14 +429,14 @@ const Brands = () => {
             <div className="col-12">
               <Form.Item
                 label="Popular Brand"
-                name={'popularBrand'}
-                rules={[{ required: true, message: 'This is required!' }]}
+                name={"popularBrand"}
+                rules={[{ required: true, message: "This is required!" }]}
                 className="fw-bold"
-                initialValue={updateBrandForm.getFieldValue('popularBrand')}
+                initialValue={updateBrandForm.getFieldValue("popularBrand")}
               >
                 <Select placeholder="Add to Popular Brands">
-                  <Select.Option value={'yes'}>Yes</Select.Option>
-                  <Select.Option value={'no'}>No</Select.Option>
+                  <Select.Option value={"yes"}>Yes</Select.Option>
+                  <Select.Option value={"no"}>No</Select.Option>
                 </Select>
               </Form.Item>
             </div>
@@ -446,7 +445,7 @@ const Brands = () => {
             <Row>
               <Col>
                 <h6>
-                  Previous Image{' '}
+                  Previous Image{" "}
                   <Tooltip title="Click to Remove Image">
                     <QuestionCircleOutlined />
                   </Tooltip>
@@ -455,7 +454,7 @@ const Brands = () => {
                   <Avatar
                     // onClick={() => handleRemoveImage(idx)}
                     size={80}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                     className="me-2"
                     shape="square"
                     src={
@@ -471,7 +470,7 @@ const Brands = () => {
           <div className="row">
             <div className="col-12">
               <Form.Item
-                name={'primary_image'}
+                name={"primary_image"}
                 // rules={[
                 //   {
                 //     required: 'true',
@@ -505,7 +504,7 @@ const Brands = () => {
               htmlType="submit"
               loading={isLoading}
               className="btnPrimary text-white cursor-pointer"
-              style={{ marginLeft: 'auto' }}
+              style={{ marginLeft: "auto" }}
             >
               Update
             </Button>

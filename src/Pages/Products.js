@@ -94,6 +94,7 @@ const Products = () => {
   const [edit, setEdit] = useState(null)
   const [discount, setDiscount] = useState("")
   const [discountedPrice, setDiscountedPrice] = useState(0)
+  const [unstitchedDiscountedPrice, setUnstitchedDiscountedPrice] = useState(0)
   const [originalPrice, setOriginalPrice] = useState(null)
   const [beforeUpload, setBeforeUpload] = useState(null)
   const [text, setText] = React.useState("")
@@ -375,6 +376,7 @@ const Products = () => {
     setBtnUpload(false)
     setDiscount("")
     setDiscountedPrice(0)
+    setUnstitchedDiscountedPrice(0)
     setOriginalPrice(null)
     setBeforeUpload(null)
   }
@@ -487,11 +489,8 @@ const Products = () => {
       sendMailFunc({
         targetAdress: user,
       })
-        .then((res) => {
-        })
-        .catch((err) => {
-        })
-
+        .then((res) => {})
+        .catch((err) => {})
     })
   }
   const handleEditProduct = async (values) => {
@@ -575,6 +574,7 @@ const Products = () => {
     setDiscount(item.discount ?? "")
     setOriginalPrice(item?.originalPrice ?? item.price)
     setDiscountedPrice(item.price)
+    setUnstitchedDiscountedPrice(item.unstitchedDiscountedPrice)
     setEdit(item)
     setKey("2")
   }
@@ -585,6 +585,7 @@ const Products = () => {
     setBtnUpload(false)
     setDiscount("")
     setDiscountedPrice(0)
+    setUnstitchedDiscountedPrice(0)
     setOriginalPrice(null)
   }
 
@@ -596,7 +597,14 @@ const Products = () => {
     }
     value = editForm.getFieldValue("discount")
     const locOriginialPrice = editForm.getFieldValue("originalPrice")
-    if (!locOriginialPrice || locOriginialPrice === "") {
+    const unstitchedOriginalPrice = editForm.getFieldValue(
+      "unstitchedOriginalPrice"
+    )
+    const stitchedValue = editForm.getFieldValue("is_stitched") || []
+    if (
+      (!locOriginialPrice && stitchedValue?.includes("yes")) ||
+      (!unstitchedOriginalPrice && stitchedValue?.includes("no"))
+    ) {
       message.warn({
         content: "Please add Price first!",
         key: "price_add_first",
@@ -605,16 +613,20 @@ const Products = () => {
       return
     }
     // setDiscountType(locDiscType)
-    let price
-    let disPrice
+    let price, unstitchPrice
+    let disPrice, unstitchDiscountPrice
     if (locDiscType === "£") {
       disPrice = locOriginialPrice - value
+      unstitchDiscountPrice = unstitchedOriginalPrice - value
     }
     if (locDiscType === "%") {
       price = (locOriginialPrice / 100) * value
+      unstitchPrice = (unstitchedOriginalPrice / 100) * value
       disPrice = locOriginialPrice - price
+      unstitchDiscountPrice = unstitchedOriginalPrice - price
     }
     disPrice = disPrice.toFixed(2)
+    setUnstitchedDiscountedPrice(unstitchDiscountPrice)
     setDiscountedPrice(disPrice)
   }
 
@@ -625,33 +637,38 @@ const Products = () => {
     }
     value = form.getFieldValue("discount") ?? 0
     const locOriginialPrice = form.getFieldValue("originalPrice")
-    if (!locOriginialPrice || locOriginialPrice === "") {
+    const unstitchedOriginalPrice = form.getFieldValue("unstitchedPrice")
+    const stitchedValue = form.getFieldValue("is_stitched") || []
+    if (!locOriginialPrice || !unstitchedOriginalPrice) {
       message.warn({
-        content: "Please add Price first!",
+        content: "Please add Prices first!",
         key: "price_add_first",
       })
       setDiscount("")
       return
     }
     // setDiscountType(locDiscType)
-    let price
-    let disPrice
+    let price, unstitechedPrice
+    let disPrice, unstitchedDiscountedPrice
     if (value) {
       if (locDiscType === "£") {
         disPrice = locOriginialPrice - value
+        unstitchedDiscountedPrice = unstitchedOriginalPrice - value
       }
       if (locDiscType === "%") {
         price = (locOriginialPrice / 100) * value
+        unstitechedPrice = (unstitchedOriginalPrice / 100) * value
         disPrice = locOriginialPrice - price
+        unstitchedDiscountedPrice = unstitchedOriginalPrice - unstitechedPrice
       }
       disPrice = +disPrice?.toFixed(2)
+      unstitchedDiscountedPrice = +unstitchedDiscountedPrice?.toFixed(2)
     } else {
       disPrice = form.getFieldValue("originalPrice")
+      unstitchedDiscountedPrice = form.getFieldValue("unstitchedPrice")
     }
     setDiscountedPrice(disPrice)
-  }
-  function containsWhitespace(str) {
-    return /\s/.test(str)
+    setUnstitchedDiscountedPrice(unstitchedDiscountedPrice)
   }
 
   // add category
@@ -844,6 +861,7 @@ const Products = () => {
                             onChange={(e) => {
                               handleDiscount(discount)
                             }}
+                            min={0}
                             prefix={<PoundCircleFilled />}
                             type="number"
                           />
@@ -1062,6 +1080,9 @@ const Products = () => {
                           <Select
                             placeholder="Select Stitched"
                             style={{ fontSize: 13, fontWeight: 300 }}
+                            maxLength={2}
+                            maxTagCount={2}
+                            mode="multiple"
                           >
                             <Option value={"yes"}>Yes</Option>
                             <Option value={"no"}>No</Option>
@@ -1354,14 +1375,45 @@ const Products = () => {
                     />
                   </Item>
                 </Col>
+                <Col md={6}>
+                  <Item
+                    label="Stitched"
+                    name="is_stitched"
+                    rules={[
+                      { required: true, message: "Please select stitched!" },
+                    ]}
+                    className="fw-bold"
+                  >
+                    <Select
+                      placeholder="Select Stitched"
+                      style={{ fontSize: 13, fontWeight: 300 }}
+                      maxLength={2}
+                      maxTagCount={2}
+                      mode="multiple"
+                      onChange={(value) => console.log(value)}
+                    >
+                      <Option value={"yes"}>Yes</Option>
+                      <Option value={"no"}>No</Option>
+                    </Select>
+                  </Item>
+                </Col>
               </Row>
               <Row>
                 <Col md={6}>
                   <Item
                     name="originalPrice"
-                    label="Original Price"
+                    label="Stitched Product Price"
                     className="fw-bold"
-                    rules={[{ required: true, message: "Please enter price!" }]}
+                    rules={[
+                      {
+                        required: form
+                          .getFieldValue("is_stitched")
+                          ?.includes("yes")
+                          ? true
+                          : false,
+                        message: "Please enter price!",
+                      },
+                    ]}
                   >
                     <Input
                       onChange={(e) => {
@@ -1369,10 +1421,39 @@ const Products = () => {
                       }}
                       prefix={<PoundCircleFilled />}
                       type="number"
+                      min={0}
                     />
                   </Item>
                 </Col>
-                <Col>
+                <Col md={6}>
+                  <Item
+                    name="unstitchedPrice"
+                    label="Unstitched Product Price"
+                    className="fw-bold"
+                    rules={[
+                      {
+                        required: form
+                          .getFieldValue("is_stitched")
+                          ?.includes("no")
+                          ? true
+                          : false,
+                        message: "Please enter price!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      onChange={(e) => {
+                        handleAddProductDiscount(discount)
+                      }}
+                      prefix={<PoundCircleFilled />}
+                      type="number"
+                      min={0}
+                    />
+                  </Item>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
                   <Item
                     label={
                       <>
@@ -1434,7 +1515,7 @@ const Products = () => {
                       type="number"
                     />
                   </Item>
-                  <span>
+                  <div>
                     <strong>
                       Discounted Price:{" "}
                       <span className="text-primary">
@@ -1445,54 +1526,19 @@ const Products = () => {
                           : form.getFieldValue("originalPrice")}
                       </span>
                     </strong>
-                  </span>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Item
-                    label="Category"
-                    name="category"
-                    rules={[
-                      { required: true, message: "Please select category!" },
-                    ]}
-                    className="fw-bold"
-                  >
-                    <Select
-                      showSearch
-                      clearIcon
-                      filterOption={(input, option) =>
-                        option.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                      maxTagCount={1}
-                      placeholder="Select Category"
-                      onSearch={(val) => setCatSearch(val.trim())}
-                      notFoundContent={
-                        <div
-                          onClick={handleAddCategory}
-                          title={`Add ${catSearch} to categories`}
-                          style={{ cursor: "pointer", color: "black" }}
-                        >
-                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
-                          <span className="me-2">Add</span>
-                          <span
-                            className="px-2"
-                            style={{ backgroundColor: "#F0F2F5" }}
-                          >
-                            {catSearch}
-                          </span>
-                        </div>
-                      }
-                      style={{ fontSize: 13, fontWeight: 300 }}
-                    >
-                      {categ &&
-                        categ?.map((item) => {
-                          return <Option value={item.id}>{item.name}</Option>
-                        })}
-                    </Select>
-                  </Item>
+                  </div>
+                  <div>
+                    <strong>
+                      Unstitched Discounted Price:{" "}
+                      <span className="text-primary">
+                        {" "}
+                        {discountType}{" "}
+                        {form.getFieldValue("discount")
+                          ? unstitchedDiscountedPrice
+                          : form.getFieldValue("unstitchedPrice")}
+                      </span>
+                    </strong>
+                  </div>
                 </Col>
                 <Col md={6}>
                   <Item
@@ -1547,19 +1593,46 @@ const Products = () => {
               <Row>
                 <Col md={6}>
                   <Item
-                    label="Stitched"
-                    name="is_stitched"
+                    label="Category"
+                    name="category"
                     rules={[
-                      { required: true, message: "Please select stitched!" },
+                      { required: true, message: "Please select category!" },
                     ]}
                     className="fw-bold"
                   >
                     <Select
-                      placeholder="Select Stitched"
+                      showSearch
+                      clearIcon
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      maxTagCount={1}
+                      placeholder="Select Category"
+                      onSearch={(val) => setCatSearch(val.trim())}
+                      notFoundContent={
+                        <div
+                          onClick={handleAddCategory}
+                          title={`Add ${catSearch} to categories`}
+                          style={{ cursor: "pointer", color: "black" }}
+                        >
+                          <i className="fa fa-plus me-2 bg-success rounded-circle p-1 text-white"></i>
+                          <span className="me-2">Add</span>
+                          <span
+                            className="px-2"
+                            style={{ backgroundColor: "#F0F2F5" }}
+                          >
+                            {catSearch}
+                          </span>
+                        </div>
+                      }
                       style={{ fontSize: 13, fontWeight: 300 }}
                     >
-                      <Option value={"yes"}>Yes</Option>
-                      <Option value={"no"}>No</Option>
+                      {categ &&
+                        categ?.map((item) => {
+                          return <Option value={item.id}>{item.name}</Option>
+                        })}
                     </Select>
                   </Item>
                 </Col>
@@ -1640,6 +1713,7 @@ const Products = () => {
                     <Select
                       placeholder="Select Stitched"
                       style={{ fontSize: 13, fontWeight: 300 }}
+                      maxLength={2}
                     >
                       <Option value={"yes"}>Yes</Option>
                       <Option value={"no"}>No</Option>
