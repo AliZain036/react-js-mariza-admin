@@ -340,6 +340,8 @@ const Products = () => {
 
   // add product in modal
   const handleAddProduct = async (values) => {
+    try {
+    } catch (error) {}
     const discountValue = form.getFieldValue("discount")
     if (!discountValue || discountValue === "0") {
       values["is_discounted"] = true
@@ -347,9 +349,25 @@ const Products = () => {
       values["is_discounted"] = false
     }
     values.discount = discount
-    values.originalPrice = originalPrice
+    // values.originalPrice = originalPrice
     values.price = discountedPrice === 0 ? values.price : discountedPrice
+    values.unstitchedDiscountPrice =
+      unstitchedDiscountedPrice === 0
+        ? values.unstitechedPrice
+        : unstitchedDiscountedPrice
     values.discountType = discountType
+    if (isNaN(values.unstitchedDiscountPrice)) {
+      values.unstitchedDiscountPrice = 0
+    }
+    if (!values.unstitchedPrice) {
+      values.unstitchedPrice = 0
+    }
+    if (isNaN(values.price)) {
+      values.price = 0
+    }
+    if (!values.price) {
+      values.price = 0
+    }
     values.createdDate = new Date()
     values["is-new-product"] = true
     setBtnUpload(true)
@@ -494,78 +512,87 @@ const Products = () => {
     })
   }
   const handleEditProduct = async (values) => {
-    if (+editForm.getFieldValue("originalPrice") < discountedPrice) {
-      message.error({
-        content: "Discount price cannot be less than original price!",
-      })
-      return
-    }
-    if (discountType === "£") {
-      if (+discount > +editForm.getFieldValue("originalPrice")) {
-        message.error("Price cannot be less than discount price")
+    try {
+      if (+editForm.getFieldValue("originalPrice") < discountedPrice) {
+        message.error({
+          content: "Discount price cannot be less than original price!",
+        })
         return
       }
-    }
-    values.discountType = discountType
-    setBtnUpload(true)
-    // return;
-    if (values.image.fileList) {
-      const url = await multiImageUpload("products", values.image.fileList)
-      values.image = [...url, ...edit.image]
-    } else {
-      values.image = [...edit.image]
-    }
-    if (values.price !== edit.price) {
-      sendProductsNotifictaion(values)
-    }
-    // values.discount = discountedPrice
-    // values.originalPrice = originalPrice
-    values.price = discountedPrice === 0 ? values.price : discountedPrice
-    values.customLink = text
-    let sizes = values?.sizes?.map((size) => size?.toLowerCase())
-    values.sizes = sizes
-    values.stock = Number(values.stock)
-    if (
-      !editForm.getFieldValue("discount") ||
-      editForm.getFieldValue("discount") == "0"
-    ) {
-      values["is_discounted"] = false
-      values["is_valid_special_offer_product"] = true
-    } else {
-      values["is_discounted"] = true
-      values["is_valid_special_offer_product"] = false
-    }
-    if (showPopConfirm === true && edit?.discount != values?.discount) {
-      values["is_valid_special_offer_product"] = false
-    } else if (showPopConfirm === true && edit?.discount == values?.discount) {
-      values["is_valid_special_offer_product"] = true
-    }
+      if (discountType === "£") {
+        if (+discount > +editForm.getFieldValue("originalPrice")) {
+          message.error("Price cannot be less than discount price")
+          return
+        }
+      }
+      values.discountType = discountType
+      setBtnUpload(true)
+      // return;
+      if (values.image.fileList) {
+        const url = await multiImageUpload("products", values.image.fileList)
+        values.image = [...url, ...edit.image]
+      } else {
+        values.image = [...edit.image]
+      }
+      if (values.price !== edit.price) {
+        sendProductsNotifictaion(values)
+      }
+      // values.discount = discountedPrice
+      // values.originalPrice = originalPrice
+      values.price = discountedPrice === 0 ? values.price : discountedPrice
+      values.customLink = text
+      let sizes = values?.sizes?.map((size) => size?.toLowerCase())
+      values.sizes = sizes
+      values.stock = Number(values.stock)
+      if (
+        !editForm.getFieldValue("discount") ||
+        editForm.getFieldValue("discount") == "0"
+      ) {
+        values["is_discounted"] = false
+        values["is_valid_special_offer_product"] = true
+      } else {
+        values["is_discounted"] = true
+        values["is_valid_special_offer_product"] = false
+      }
+      if (showPopConfirm === true && edit?.discount != values?.discount) {
+        values["is_valid_special_offer_product"] = false
+      } else if (
+        showPopConfirm === true &&
+        edit?.discount == values?.discount
+      ) {
+        values["is_valid_special_offer_product"] = true
+      }
 
-    let arr = offerDetail?.products
-    let ind = offerDetail?.products?.findIndex((item) => item === edit?.id)
-    arr.splice(ind, 1)
+      let arr = offerDetail?.products
+      let ind = offerDetail?.products?.findIndex((item) => item === edit?.id)
+      arr?.splice(ind, 1)
 
-    await firebase
-      .firestore()
-      .collection("products")
-      .doc(edit.id)
-      .set(values, { merge: true })
-      .then(() => {
-        message.success(edit.name + " updated")
-        handleBack()
-        getProducts()
-        dispatch(fetchProducts())
-      })
-    let tempOfferDetail = offerDetail
-    tempOfferDetail.products = arr
-    if (showPopConfirm === true && edit?.discount != values?.discount) {
       await firebase
         .firestore()
-        .collection("specialOffer")
-        .doc(offerDetail?.id)
-        .update(tempOfferDetail)
+        .collection("products")
+        .doc(edit.id)
+        .set(values, { merge: true })
+        .then(() => {
+          message.success(edit.name + " updated")
+          handleBack()
+          getProducts()
+          dispatch(fetchProducts())
+        })
+      let tempOfferDetail = offerDetail
+      if (arr) {
+        tempOfferDetail.products = arr
+      }
+      if (showPopConfirm === true && edit?.discount != values?.discount) {
+        await firebase
+          .firestore()
+          .collection("specialOffer")
+          .doc(offerDetail?.id)
+          .update(tempOfferDetail)
+      }
+      setBtnUpload(false)
+    } catch (error) {
+      console.error(error)
     }
-    setBtnUpload(false)
   }
 
   const handleEdit = (item) => {
@@ -597,14 +624,9 @@ const Products = () => {
     }
     value = editForm.getFieldValue("discount")
     const locOriginialPrice = editForm.getFieldValue("originalPrice")
-    const unstitchedOriginalPrice = editForm.getFieldValue(
-      "unstitchedOriginalPrice"
-    )
+    const unstitchedOriginalPrice = editForm.getFieldValue("unstitchedPrice")
     const stitchedValue = editForm.getFieldValue("is_stitched") || []
-    if (
-      (!locOriginialPrice && stitchedValue?.includes("yes")) ||
-      (!unstitchedOriginalPrice && stitchedValue?.includes("no"))
-    ) {
+    if (!locOriginialPrice && !unstitchedOriginalPrice) {
       message.warn({
         content: "Please add Price first!",
         key: "price_add_first",
@@ -639,7 +661,7 @@ const Products = () => {
     const locOriginialPrice = form.getFieldValue("originalPrice")
     const unstitchedOriginalPrice = form.getFieldValue("unstitchedPrice")
     const stitchedValue = form.getFieldValue("is_stitched") || []
-    if (!locOriginialPrice || !unstitchedOriginalPrice) {
+    if (!locOriginialPrice && !unstitchedOriginalPrice) {
       message.warn({
         content: "Please add Prices first!",
         key: "price_add_first",
@@ -848,6 +870,56 @@ const Products = () => {
                       </Col>
                     </Row>
                     <Row>
+                      <Col md={6}>
+                        <Item
+                          label="Stitched"
+                          name="is_stitched"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select stitched!",
+                            },
+                          ]}
+                          className="fw-bold"
+                        >
+                          <Select
+                            placeholder="Select Stitched"
+                            style={{ fontSize: 13, fontWeight: 300 }}
+                            maxLength={2}
+                            maxTagCount={2}
+                            mode="multiple"
+                          >
+                            <Option value={"yes"}>Yes</Option>
+                            <Option value={"no"}>No</Option>
+                          </Select>
+                        </Item>
+                      </Col>
+                      <Item
+                        name="unstitchedPrice"
+                        label="Unstitched Product Price"
+                        className="fw-bold"
+                        rules={[
+                          {
+                            required: editForm
+                              .getFieldValue("is_stitched")
+                              ?.includes("no")
+                              ? true
+                              : false,
+                            message: "Please enter price!",
+                          },
+                        ]}
+                      >
+                        <Input
+                          onChange={(e) => {
+                            handleDiscount(discount)
+                          }}
+                          prefix={<PoundCircleFilled />}
+                          type="number"
+                          min={0}
+                        />
+                      </Item>
+                    </Row>
+                    <Row>
                       <Col md={4}>
                         <Item
                           name="originalPrice"
@@ -934,7 +1006,7 @@ const Products = () => {
                             type="number"
                           />
                         </Item>
-                        <span>
+                        <div>
                           <strong>
                             Discounted Price:{" "}
                             <span className="text-primary">
@@ -942,7 +1014,19 @@ const Products = () => {
                               {discountType} {discountedPrice}
                             </span>
                           </strong>
-                        </span>
+                        </div>
+                        <div>
+                          <strong>
+                            Unstitched Discounted Price:{" "}
+                            <span className="text-primary">
+                              {" "}
+                              {discountType}{" "}
+                              {editForm.getFieldValue("discount")
+                                ? unstitchedDiscountedPrice
+                                : editForm.getFieldValue("unstitchedPrice")}
+                            </span>
+                          </strong>
+                        </div>
                       </Col>
                       <Col md={4}>
                         <Item
@@ -1012,7 +1096,7 @@ const Products = () => {
                           </Select>
                         </Item>
                       </Col>
-                      <Col md={6}>
+                      {/* <Col md={6}>
                         <Item
                           label="Colors"
                           name="colors"
@@ -1062,33 +1146,9 @@ const Products = () => {
                               })}
                           </Select>
                         </Item>
-                      </Col>
+                      </Col> */}
                     </Row>
                     <Row>
-                      <Col md={6}>
-                        <Item
-                          label="Stitched"
-                          name="is_stitched"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please select stitched!",
-                            },
-                          ]}
-                          className="fw-bold"
-                        >
-                          <Select
-                            placeholder="Select Stitched"
-                            style={{ fontSize: 13, fontWeight: 300 }}
-                            maxLength={2}
-                            maxTagCount={2}
-                            mode="multiple"
-                          >
-                            <Option value={"yes"}>Yes</Option>
-                            <Option value={"no"}>No</Option>
-                          </Select>
-                        </Item>
-                      </Col>
                       <Col md={6}>
                         <Item
                           label="Cloth Types"
@@ -1540,7 +1600,7 @@ const Products = () => {
                     </strong>
                   </div>
                 </Col>
-                <Col md={6}>
+                {/* <Col md={6}>
                   <Item
                     label="Colors"
                     name="colors"
@@ -1588,7 +1648,7 @@ const Products = () => {
                         })}
                     </Select>
                   </Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row>
                 <Col md={6}>

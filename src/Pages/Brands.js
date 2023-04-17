@@ -46,18 +46,18 @@ const Brands = () => {
   const [isUpdateBrandModalOpen, setIsUpdateBrandModalOpen] = useState(false)
   const [addBrandForm] = Form.useForm()
   const [updateBrandForm] = Form.useForm()
-  const [fileName, setFileName] = useState('')
-  const [actionBtnId, setActionBtnId] = useState('')
+  const [fileName, setFileName] = useState("")
+  const [actionBtnId, setActionBtnId] = useState("")
   let brandsTableColumns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Primary Image',
-      dataIndex: 'primary_image',
-      key: 'primary_image',
+      title: "Primary Image",
+      dataIndex: "primary_image",
+      key: "primary_image",
       render: (url) => (
         <div className="d-flex flex-wrap">
           <Avatar size={65} shape="square" src={<Image src={url} />} />
@@ -65,9 +65,9 @@ const Brands = () => {
       ),
     },
     {
-      title: 'Actions',
-      dataIndex: 'id',
-      key: 'actions',
+      title: "Actions",
+      dataIndex: "id",
+      key: "actions",
       render: (id, item) => (
         <Space wrap>
           <Button
@@ -80,7 +80,7 @@ const Brands = () => {
                 primary_image: item.primary_image,
                 popularBrand: item.is_popular_brand,
               })
-              console.log(updateBrandForm.getFieldValue('products'))
+              console.log(updateBrandForm.getFieldValue("products"))
               setBrandDetails({ id: id, ...item })
               setIsUpdateBrandModalOpen(true)
             }}
@@ -97,12 +97,12 @@ const Brands = () => {
             okText="Yes"
             cancelText="No"
           >
-          <Button
-            // loading={actionBtnId === id}
-            className="btnDanger text-white"
-          >
-            <DeleteFilled />
-          </Button>
+            <Button
+              // loading={actionBtnId === id}
+              className="btnDanger text-white"
+            >
+              <DeleteFilled />
+            </Button>
           </Popconfirm>
         </Space>
       ),
@@ -117,7 +117,7 @@ const Brands = () => {
 
   const handleDeleteBrand = async (id) => {
     setIsLoading(true)
-    let response = await deleteDoc('brands', id)
+    let response = await deleteDoc("brands", id)
     if (response === true) {
       setIsLoading(false)
       getAllBrands()
@@ -126,7 +126,7 @@ const Brands = () => {
 
   const getAllBrands = async () => {
     setIsLoading(true)
-    let data = await getData('brands')
+    let data = await getData("brands")
     setIsLoading(false)
     if (data) {
       console.log(data)
@@ -135,38 +135,42 @@ const Brands = () => {
   }
 
   const getAllColors = async () => {
-    let data = await getData('colors')
+    let data = await getData("colors")
     if (data) {
       setColors(data)
     }
   }
 
   const getAllProducts = async () => {
-    let data = await getData('products')
+    let data = await getData("products")
     if (data) {
       setProducts(data)
     }
   }
 
   const handleAddBrand = async (values) => {
-    setBrandDetails(null)
-    setIsLoading(true)
-    let brand_primary_image_url = await singleImageUpload(
-      "brand-images",
-      values.primary_image.file.originFileObj
-    )
-    const body = {
-      name: values.name,
-      products: values?.products || [],
-      primary_image: brand_primary_image_url,
-      is_popular_brand: values.popularBrand,
+    try {
+      setBrandDetails(null)
+      setIsLoading(true)
+      let brand_primary_image_url = await singleImageUpload(
+        "brand-images",
+        values.primary_image.file.originFileObj
+      )
+      const body = {
+        name: values.name,
+        products: values?.products || [],
+        primary_image: brand_primary_image_url,
+        is_popular_brand: values.popularBrand,
+      }
+      let response = await addDoc("brands", body)
+      if (response === true) {
+        getAllBrands()
+      }
+      setIsLoading(false)
+      setIsAddBrandModalOpen(false)
+    } catch (error) {
+      console.error(error)
     }
-    let response = await addDoc("brands", body)
-    if (response === true) {
-      getAllBrands()
-    }
-    setIsLoading(false)
-    setIsAddBrandModalOpen(false)
   }
 
   const handleUpdateBrand = async (values) => {

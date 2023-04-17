@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "mariza-admin-panel"
-  }
+    "default": "mariza-admin-panel",
+    "mariza-admin-panel-dev": "mariza-admin-panel-dev",
+    "mariza-admin-panel": "mariza-admin-panel"
+  },
+  "targets": {},
+  "etags": {}
 }
