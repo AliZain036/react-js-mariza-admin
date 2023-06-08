@@ -15,6 +15,7 @@
     "bootstrap": "^5.0.1",
     "ckeditor5-build-classic-extended": "^20.0.1",
     "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
     "firebase": "^8.10.1",
     "firebase-admin": "^9.10.0",
     "firebase-tools": "^10.5.0",
@@ -43,7 +44,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3010 react-scripts start",
     "dev": "code . && react-scripts start",
     "build:dev": "REACT_APP_ENV=development react-scripts build",
     "build:prod": "REACT_APP_ENV=production react-scripts build",

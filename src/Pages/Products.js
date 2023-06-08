@@ -128,21 +128,6 @@ const Products = () => {
         </div>
       ),
     },
-    // {
-    //   title: 'Colors',
-    //   dataIndex: 'colors',
-    //   key: 'colors',
-    //   render: (colorsArr) => (
-    //     <div style={colStyle} className="scroll">
-    //       {colorsArr &&
-    //         colorsArr?.map((item) => (
-    //           <Tag className="rounded-pill my-1" color="cyan">
-    //             {colors?.find((cat) => cat.id === item)?.name}
-    //           </Tag>
-    //         ))}
-    //     </div>
-    //   ),
-    // },
     {
       title: "Brand",
       dataIndex: "brand",
@@ -183,12 +168,36 @@ const Products = () => {
       ),
     },
     {
-      title: "Price (£)",
-      dataIndex: "price",
-      key: "price",
+      title: "Unstitched Price (£)",
+      dataIndex: "unstitchedPrice",
+      key: "unstitchedPrice",
       render: (price, item) => {
-        if (item.discount === "" || !item.discount || item.discount === "0") {
-          return item.price
+        if (+item.unstitchedDiscountPrice == +item.unstitchedPrice) {
+          return item.unstitchedPrice
+        } else {
+          return (
+            <span>
+              <del className="text-danger fst-italic me-2">
+                {item.unstitchedPrice}
+              </del>
+              <Tooltip title="Discounted Price">
+                <Tag className="fw-bold rounded-pill" color="orange">
+                  {item.unstitchedDiscountPrice}
+                </Tag>
+              </Tooltip>
+            </span>
+          )
+        }
+      },
+      sorter: (a, b) => a.price - b.price,
+    },
+    {
+      title: "Price (£)",
+      dataIndex: "originalPrice",
+      key: "originalPrice",
+      render: (price, item) => {
+        if (+item.price === +item.originalPrice) {
+          return item.originalPrice
         } else {
           return (
             <span>
@@ -340,13 +349,26 @@ const Products = () => {
 
   // add product in modal
   const handleAddProduct = async (values) => {
-    try {
-    } catch (error) {}
-    const discountValue = form.getFieldValue("discount")
-    if (!discountValue || discountValue === "0") {
-      values["is_discounted"] = true
-    } else {
-      values["is_discounted"] = false
+    if (
+      values.is_stitched?.length === 2 &&
+      (!values.unstitchedPrice || !values.originalPrice)
+    ) {
+      message.error({
+        content: "Please add unstitched and stitched price",
+      })
+      return
+    }
+    if (values.is_stitched.includes("yes") && !values.originalPrice) {
+      message.error({
+        content: "Please add stitched price",
+      })
+      return
+    }
+    if (values.is_stitched.includes("no") && !values.unstitchedPrice) {
+      message.error({
+        content: "Please add unstitched price",
+      })
+      return
     }
     values.discount = discount
     // values.originalPrice = originalPrice
@@ -377,6 +399,14 @@ const Products = () => {
     values.admin = user // id of admin that posted the product
     let sizes = values?.sizes?.map((size) => size?.toLowerCase())
     values.sizes = sizes
+    if (values.originalPrice === undefined) {
+      values.originalPrice = 0
+    }
+    if (!discount || discount == "0") {
+      values["is_discounted"] = false
+    } else {
+      values["is_discounted"] = true
+    }
     let response = await addDoc("products", values)
     setBtnUpload(false)
     if (response === true) {
@@ -511,17 +541,46 @@ const Products = () => {
         .catch((err) => {})
     })
   }
+
   const handleEditProduct = async (values) => {
     try {
-      if (+editForm.getFieldValue("originalPrice") < discountedPrice) {
+      if (
+        values.is_stitched?.length === 2 &&
+        (!values.unstitchedPrice || !values.originalPrice)
+      ) {
         message.error({
-          content: "Discount price cannot be less than original price!",
+          content: "Please add unstitched and stitched price",
+        })
+        return
+      }
+      if (values.is_stitched.includes("yes") && !values.originalPrice) {
+        message.error({
+          content: "Please add stitched price",
+        })
+        return
+      }
+      if (values.is_stitched.includes("no") && !values.unstitchedPrice) {
+        message.error({
+          content: "Please add unstitched price",
+        })
+        return
+      }
+      if (values.originalPrice == undefined) {
+        values.originalPrice = 0
+      }
+      if (+values.originalPrice < discountedPrice) {
+        message.error({
+          content: "Discount price cannot be less than stitched price!",
         })
         return
       }
       if (discountType === "£") {
         if (+discount > +editForm.getFieldValue("originalPrice")) {
-          message.error("Price cannot be less than discount price")
+          message.error("Stitched Price cannot be less than discount price")
+          return
+        }
+        if (+discount > +editForm.getFieldValue("unstitchedPrice")) {
+          message.error("Unstitched Price cannot be less than discount price")
           return
         }
       }
@@ -539,8 +598,12 @@ const Products = () => {
       }
       // values.discount = discountedPrice
       // values.originalPrice = originalPrice
-      values.price = discountedPrice === 0 ? values.price : discountedPrice
-      values.customLink = text
+      values.price =
+        discountedPrice === 0 ? values.unstitchedPrice : discountedPrice
+      values.unstitchedDiscountPrice = unstitchedDiscountedPrice
+        ? unstitchedDiscountedPrice
+        : values.unstitchedPrice
+      // values.customLink = text
       let sizes = values?.sizes?.map((size) => size?.toLowerCase())
       values.sizes = sizes
       values.stock = Number(values.stock)
@@ -591,6 +654,7 @@ const Products = () => {
       }
       setBtnUpload(false)
     } catch (error) {
+      setBtnUpload(false)
       console.error(error)
     }
   }
@@ -601,7 +665,9 @@ const Products = () => {
     setDiscount(item.discount ?? "")
     setOriginalPrice(item?.originalPrice ?? item.price)
     setDiscountedPrice(item.price)
-    setUnstitchedDiscountedPrice(item.unstitchedDiscountedPrice)
+    setUnstitchedDiscountedPrice(
+      item.unstitchedDiscountPrice ?? item.unstitchedPrice
+    )
     setEdit(item)
     setKey("2")
   }
@@ -638,14 +704,14 @@ const Products = () => {
     let price, unstitchPrice
     let disPrice, unstitchDiscountPrice
     if (locDiscType === "£") {
-      disPrice = locOriginialPrice - value
-      unstitchDiscountPrice = unstitchedOriginalPrice - value
+      disPrice = Number(locOriginialPrice) - Number(value)
+      unstitchDiscountPrice = Number(unstitchedOriginalPrice) - Number(value)
     }
     if (locDiscType === "%") {
-      price = (locOriginialPrice / 100) * value
-      unstitchPrice = (unstitchedOriginalPrice / 100) * value
-      disPrice = locOriginialPrice - price
-      unstitchDiscountPrice = unstitchedOriginalPrice - price
+      price = (Number(locOriginialPrice) / 100) * Number(value)
+      unstitchPrice = (Number(unstitchedOriginalPrice) / 100) * Number(value)
+      disPrice = Number(locOriginialPrice) - price
+      unstitchDiscountPrice = Number(unstitchedOriginalPrice) - unstitchPrice
     }
     disPrice = disPrice.toFixed(2)
     setUnstitchedDiscountedPrice(unstitchDiscountPrice)
@@ -905,12 +971,17 @@ const Products = () => {
                               ?.includes("no")
                               ? true
                               : false,
-                            message: "Please enter price!",
+                            message: "Please enter unstitched item price!",
                           },
                         ]}
                       >
                         <Input
                           onChange={(e) => {
+                            if(!editForm.getFieldValue("is_stitched")?.includes("no")) {
+                              message.warning('Please choose No from stitched dropdown options first')
+                              editForm.setFieldsValue({ unstitchedPrice: "" })
+                              return
+                            }
                             handleDiscount(discount)
                           }}
                           prefix={<PoundCircleFilled />}
@@ -923,14 +994,26 @@ const Products = () => {
                       <Col md={4}>
                         <Item
                           name="originalPrice"
-                          label="Original Price"
+                          label="Stitched Price"
                           className="fw-bold"
                           rules={[
-                            { required: true, message: "Please enter price!" },
+                            {
+                              required: editForm
+                                .getFieldValue("is_stitched")
+                                ?.includes("yes")
+                                ? true
+                                : false,
+                              message: "Please enter stitched item price!",
+                            },
                           ]}
                         >
                           <Input
                             onChange={(e) => {
+                              if(!editForm.getFieldValue("is_stitched")?.includes("yes")) {
+                                message.warning('Please choose Yes from stitched dropdown options first')
+                                editForm.setFieldsValue({ originalPrice: "" })
+                                return
+                              }
                               handleDiscount(discount)
                             }}
                             min={0}
@@ -950,13 +1033,17 @@ const Products = () => {
                                     onChange={(e) => {
                                       const locOriginalPrice =
                                         editForm.getFieldValue("originalPrice")
+                                      const locUnstitchedProdPrice =
+                                        editForm.getFieldValue(
+                                          "unstitchedPrice"
+                                        )
                                       if (locOriginalPrice) {
                                         setDiscountType(e.target.value)
                                         handleDiscount(discount, e.target.value)
                                       } else {
                                         if (
                                           !locOriginalPrice ||
-                                          locOriginalPrice === ""
+                                          !locUnstitchedProdPrice
                                         ) {
                                           message.warn({
                                             content: "Please add Price first!",
@@ -992,14 +1079,10 @@ const Products = () => {
                               handleDiscount(e.target.value)
                             }}
                             min={0}
-                            max={
-                              discountType === "%"
-                                ? 70
-                                : +editForm.getFieldValue("originalPrice")
-                            }
-                            // value={discount}
+                            max={discountType === "%" ? 70 : ""}
                             disabled={
-                              !editForm.getFieldValue("originalPrice") ||
+                              (!editForm.getFieldValue("originalPrice") &&
+                                !editForm.getFieldValue("unstitchedPrice")) ||
                               !discountType
                             }
                             prefix={discountType}
@@ -1011,7 +1094,7 @@ const Products = () => {
                             Discounted Price:{" "}
                             <span className="text-primary">
                               {" "}
-                              {discountType} {discountedPrice}
+                              {discountedPrice}
                             </span>
                           </strong>
                         </div>
@@ -1020,10 +1103,7 @@ const Products = () => {
                             Unstitched Discounted Price:{" "}
                             <span className="text-primary">
                               {" "}
-                              {discountType}{" "}
-                              {editForm.getFieldValue("discount")
-                                ? unstitchedDiscountedPrice
-                                : editForm.getFieldValue("unstitchedPrice")}
+                              {unstitchedDiscountedPrice}
                             </span>
                           </strong>
                         </div>
@@ -1305,7 +1385,7 @@ const Products = () => {
                             edit?.image?.map((item, index) => (
                               <div className="position-relative d-flex mt-2">
                                 <div>
-                                  {index != 0 && (
+                                  {edit?.image?.length > 1 && (
                                     <i
                                       className="fas fa-trash fs-5"
                                       style={{ cursor: "pointer" }}
@@ -1477,7 +1557,13 @@ const Products = () => {
                   >
                     <Input
                       onChange={(e) => {
-                        handleAddProductDiscount(discount)
+                        if(!form.getFieldValue("is_stitched")?.includes("yes")) {
+                          message.warning('Please choose Yes from stitched dropdown options first')
+                          form.setFieldsValue({ originalPrice: "" })
+                          return
+                        } else {
+                          handleAddProductDiscount(discount)
+                        }
                       }}
                       prefix={<PoundCircleFilled />}
                       type="number"
@@ -1503,6 +1589,11 @@ const Products = () => {
                   >
                     <Input
                       onChange={(e) => {
+                        if(!form.getFieldValue("is_stitched")?.includes("no")) {
+                          message.warning('Please choose No from stitched dropdown options first')
+                          form.setFieldsValue({ unstitchedPrice: "" })
+                          return
+                        }
                         handleAddProductDiscount(discount)
                       }}
                       prefix={<PoundCircleFilled />}
@@ -1580,7 +1671,6 @@ const Products = () => {
                       Discounted Price:{" "}
                       <span className="text-primary">
                         {" "}
-                        {discountType}{" "}
                         {form.getFieldValue("discount")
                           ? discountedPrice
                           : form.getFieldValue("originalPrice")}
@@ -1591,8 +1681,6 @@ const Products = () => {
                     <strong>
                       Unstitched Discounted Price:{" "}
                       <span className="text-primary">
-                        {" "}
-                        {discountType}{" "}
                         {form.getFieldValue("discount")
                           ? unstitchedDiscountedPrice
                           : form.getFieldValue("unstitchedPrice")}
