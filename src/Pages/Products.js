@@ -568,7 +568,7 @@ const Products = () => {
       if (values.originalPrice == undefined) {
         values.originalPrice = 0
       }
-      if (+values.originalPrice < discountedPrice) {
+      if (+values.originalPrice < +discountedPrice) {
         message.error({
           content: "Discount price cannot be less than stitched price!",
         })
@@ -713,7 +713,7 @@ const Products = () => {
       disPrice = Number(locOriginialPrice) - price
       unstitchDiscountPrice = Number(unstitchedOriginalPrice) - unstitchPrice
     }
-    disPrice = disPrice.toFixed(2)
+    // disPrice = disPrice.toFixed(2)
     setUnstitchedDiscountedPrice(unstitchDiscountPrice)
     setDiscountedPrice(disPrice)
   }
@@ -749,8 +749,8 @@ const Products = () => {
         disPrice = locOriginialPrice - price
         unstitchedDiscountedPrice = unstitchedOriginalPrice - unstitechedPrice
       }
-      disPrice = +disPrice?.toFixed(2)
-      unstitchedDiscountedPrice = +unstitchedDiscountedPrice?.toFixed(2)
+      // disPrice = +disPrice?.toFixed(2)
+      // unstitchedDiscountedPrice = +unstitchedDiscountedPrice?.toFixed(2)
     } else {
       disPrice = form.getFieldValue("originalPrice")
       unstitchedDiscountedPrice = form.getFieldValue("unstitchedPrice")
