@@ -150,6 +150,7 @@ const Brands = () => {
 
   const handleAddBrand = async (values) => {
     try {
+      addBrandForm.resetFields()
       setBrandDetails(null)
       setIsLoading(true)
       let brand_primary_image_url = await singleImageUpload(

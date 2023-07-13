@@ -349,6 +349,7 @@ const Products = () => {
 
   // add product in modal
   const handleAddProduct = async (values) => {
+    form.resetFields()
     if (
       values.is_stitched?.length === 2 &&
       (!values.unstitchedPrice || !values.originalPrice)
