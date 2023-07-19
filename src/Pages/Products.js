@@ -144,13 +144,6 @@ const Products = () => {
       title: "Stock",
       dataIndex: "stock",
       key: "stock",
-      // render: (brandId) => (
-      //   <div style={colStyle} className="scroll">
-      //     <Tag className="rounded-pill my-1" color="cyan">
-      //       {brands?.find((brand) => brand.id === brandId)?.name}
-      //     </Tag>
-      //   </div>
-      // ),
     },
     {
       title: "Cloth Type",
@@ -458,54 +451,6 @@ const Products = () => {
       .finally(() => setisLoading(false))
   }
 
-  const getUsers = async () => {
-    // dispatch(fetchUsers());
-    try {
-      await firebase
-        .firestore()
-        .collection("users")
-        .get()
-        .then((docs) => {
-          let arr = []
-          docs.forEach((doc) => {
-            let obj = {
-              id: doc.id,
-              ...doc.data(),
-            }
-            arr.push(obj)
-          })
-          setAllUsers(arr)
-          // setSearch(arr);
-        })
-    } catch (error) {
-      console.log(error.message)
-    }
-    setIsLoading(false)
-  }
-  // edit modal form
-  const getWishlist = async () => {
-    try {
-      await firebase
-        .firestore()
-        .collection("wishlists")
-        .get()
-        .then((docs) => {
-          let arr = []
-          docs.forEach((doc) => {
-            let obj = {
-              id: doc.id,
-              ...doc.data(),
-            }
-            arr.push(obj)
-          })
-          setAllWishlist(arr)
-          // setSearch(arr);
-        })
-    } catch (error) {
-      console.log(error.message)
-    }
-    setIsLoading(false)
-  }
   const sendProductsNotifictaion = (values) => {
     // edit
 

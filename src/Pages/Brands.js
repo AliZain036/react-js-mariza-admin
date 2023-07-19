@@ -198,6 +198,7 @@ const Brands = () => {
     }
     let result = await updateDoc("brands", brandDetails.id, body)
     if (result === true) {
+      updateBrandForm.resetFields()
       message.success("Brand Updated Successfully!")
       getAllBrands()
     }
@@ -476,17 +477,10 @@ const Brands = () => {
             <div className="col-12">
               <Form.Item
                 name={"primary_image"}
-                // rules={[
-                //   {
-                //     required: 'true',
-                //     message: 'Please add brand primary image!',
-                //   },
-                // ]}
                 label="Primary Image"
               >
                 <Dragger
                   maxCount={1}
-                  // multiple={false}
                   customRequest={dummyRequest}
                   listType="picture"
                 >
