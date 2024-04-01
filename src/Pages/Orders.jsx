@@ -4,7 +4,7 @@ import {
   PoundCircleFilled,
   QuestionCircleOutlined,
   UploadOutlined,
-} from "@ant-design/icons"
+} from "@ant-design/icons";
 import {
   Avatar,
   BackTop,
@@ -26,13 +26,13 @@ import {
   Tag,
   Tooltip,
   Upload,
-} from "antd"
-import { cloneDeep, debounce, filter, map, some } from "lodash"
-import moment from "moment"
-import React, { useEffect, useState } from "react"
-import { Col, Container, Row } from "react-bootstrap"
-import { useDispatch, useSelector } from "react-redux"
-import { firebase } from "../Firebase/config"
+} from "antd";
+import { cloneDeep, debounce, filter, map, some } from "lodash";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { Col, Container, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { firebase } from "../Firebase/config";
 import {
   deleteStorageFiles,
   multiImageUpload,
@@ -41,23 +41,23 @@ import {
   saveData,
   addDoc,
   getData,
-} from "../Firebase/utils"
-import { addCategory, fetchCategories } from "../Redux/Actions/categories"
-import { addInterest, fetchInterests } from "../Redux/Actions/interest"
-import { addOccasions, fetchOccasions } from "../Redux/Actions/occasions"
-import { fetchProducts, updateProduct } from "../Redux/Actions/products"
-import { addRecipient, fetchRecipients } from "../Redux/Actions/recipients"
+} from "../Firebase/utils";
+import { addCategory, fetchCategories } from "../Redux/Actions/categories";
+import { addInterest, fetchInterests } from "../Redux/Actions/interest";
+import { addOccasions, fetchOccasions } from "../Redux/Actions/occasions";
+import { fetchProducts, updateProduct } from "../Redux/Actions/products";
+import { addRecipient, fetchRecipients } from "../Redux/Actions/recipients";
 import {
   mapCategories,
   mapInterests,
   mapOccasions,
   mapRecipients,
-} from "../utils/map"
-import { backToTop } from "./styles/styles"
+} from "../utils/map";
+import { backToTop } from "./styles/styles";
 
-const { Item } = Form
-const { Option } = Select
-const { TabPane } = Tabs
+const { Item } = Form;
+const { Option } = Select;
+const { TabPane } = Tabs;
 
 const colStyle = {
   maxHeight: "200px",
@@ -66,92 +66,92 @@ const colStyle = {
   flexWrap: "wrap",
   overflowY: "auto",
   overflowX: "hidden",
-}
+};
 
 const Orders = () => {
   // id of admin
-  const sendMailFunc = firebase.functions().httpsCallable("sendMail")
-  const [fileName, setFileName] = useState("")
-  const dispatch = useDispatch()
-  const [discountType, setDiscountType] = useState("%")
-  const [catSearch, setCatSearch] = useState("")
-  const [productDetails, setProductDetails] = useState(null)
-  const [colorSearch, setColorSearch] = useState("")
-  const [clothTypeSearch, setClothTypeSearch] = useState("")
-  const [brands, setBrands] = useState([])
-  const [orders, setOrders] = useState([])
-  const [interSearch, setInterSearch] = useState("")
-  const [recSearch, setRecSearch] = useState("")
-  const user = useSelector((state) => state.user.user)
-  const [allProducts, setAllProducts] = useState(null)
-  const [featuredCount, setfeaturedCount] = useState(0)
-  const [isLoading, setisLoading] = useState(false)
-  const [allUsers, setAllUsers] = useState([])
-  const [IsLoading, setIsLoading] = useState(true)
-  const [search, setSearch] = useState(allProducts)
-  const [show, setShow] = useState(false)
-  const [categ, setCateg] = useState(null)
-  const [recipients, setRecipients] = useState(null)
-  const [interests, setInterests] = useState(null)
-  const [occasions, setOccasions] = useState(null)
-  const [colors, setColors] = useState([])
-  const [clothTypes, setClothTypes] = useState([])
-  const [form] = Form.useForm()
-  const [editForm] = Form.useForm()
-  const [btnUpload, setBtnUpload] = useState(false)
-  const [key, setKey] = useState("1")
-  const [edit, setEdit] = useState(null)
-  const [discount, setDiscount] = useState("")
-  const [discountedPrice, setDiscountedPrice] = useState(0)
-  const [originalPrice, setOriginalPrice] = useState(null)
-  const [previewLink, setPreviewLink] = useState("")
-  const [beforeUpload, setBeforeUpload] = useState(null)
-  const [fileModal, setFileModal] = useState(false)
-  const [spaceWarnigShow, setspaceWarnigShow] = useState(false)
-  const [text, setText] = React.useState("")
-  const [allWishlist, setAllWishlist] = React.useState("")
-  const currentdateTime = moment().format("DD-MM-YYYY hh:mm:ss A")
+  const sendMailFunc = firebase.functions().httpsCallable("sendMail");
+  const [fileName, setFileName] = useState("");
+  const dispatch = useDispatch();
+  const [discountType, setDiscountType] = useState("%");
+  const [catSearch, setCatSearch] = useState("");
+  const [productDetails, setProductDetails] = useState(null);
+  const [colorSearch, setColorSearch] = useState("");
+  const [clothTypeSearch, setClothTypeSearch] = useState("");
+  const [brands, setBrands] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [interSearch, setInterSearch] = useState("");
+  const [recSearch, setRecSearch] = useState("");
+  const user = useSelector((state) => state.user.user);
+  const [allProducts, setAllProducts] = useState(null);
+  const [featuredCount, setfeaturedCount] = useState(0);
+  const [isLoading, setisLoading] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [IsLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState(allProducts);
+  const [show, setShow] = useState(false);
+  const [categ, setCateg] = useState(null);
+  const [recipients, setRecipients] = useState(null);
+  const [interests, setInterests] = useState(null);
+  const [occasions, setOccasions] = useState(null);
+  const [colors, setColors] = useState([]);
+  const [clothTypes, setClothTypes] = useState([]);
+  const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
+  const [btnUpload, setBtnUpload] = useState(false);
+  const [key, setKey] = useState("1");
+  const [edit, setEdit] = useState(null);
+  const [discount, setDiscount] = useState("");
+  const [discountedPrice, setDiscountedPrice] = useState(0);
+  const [originalPrice, setOriginalPrice] = useState(null);
+  const [previewLink, setPreviewLink] = useState("");
+  const [beforeUpload, setBeforeUpload] = useState(null);
+  const [fileModal, setFileModal] = useState(false);
+  const [spaceWarnigShow, setspaceWarnigShow] = useState(false);
+  const [text, setText] = React.useState("");
+  const [allWishlist, setAllWishlist] = React.useState("");
+  const currentdateTime = moment().format("DD-MM-YYYY hh:mm:ss A");
 
   // redux
-  const categoriesRedux = useSelector((state) => state.categories)
-  const occasionsRedux = useSelector((state) => state.occasions)
-  const interestsRedux = useSelector((state) => state.interests)
-  const recipientsRedux = useSelector((state) => state.recipients)
-  const productsRedux = useSelector((state) => state.products)
+  const categoriesRedux = useSelector((state) => state.categories);
+  const occasionsRedux = useSelector((state) => state.occasions);
+  const interestsRedux = useSelector((state) => state.interests);
+  const recipientsRedux = useSelector((state) => state.recipients);
+  const productsRedux = useSelector((state) => state.products);
 
   const handleFeature = async (feature) => {
-    console.log(feature)
+    console.log(feature);
     if (feature.stats.featured === false) {
-      feature.stats.featured = true
-      await updateProduct(feature?.id, feature)
-      await getProducts()
-      await dispatch(fetchProducts())
+      feature.stats.featured = true;
+      await updateProduct(feature?.id, feature);
+      await getProducts();
+      await dispatch(fetchProducts());
     } else {
-      feature.stats.featured = false
-      await updateProduct(feature?.id, feature)
-      await getProducts()
-      await dispatch(fetchProducts())
+      feature.stats.featured = false;
+      await updateProduct(feature?.id, feature);
+      await getProducts();
+      await dispatch(fetchProducts());
     }
-    await getProducts()
-    await dispatch(fetchProducts())
+    await getProducts();
+    await dispatch(fetchProducts());
     const count = productsRedux?.products.filter((obj) => {
       if (obj.stats.featured === true) {
-        return true
+        return true;
       }
 
-      return false
-    }).length
-    setfeaturedCount(() => count)
-  }
+      return false;
+    }).length;
+    setfeaturedCount(() => count);
+  };
   const columns = [
     {
       title: "Name",
-      dataIndex: "first_name",
-      key: "first_name",
-      render: (firstName, record) => {
-        if (record?.email)
-          return <p>{record?.first_name + " " + record?.last_name}</p>
-        else return <p>{record?.session?.shipping_details?.name}</p>
+      dataIndex: "shipping_details",
+      key: "shipping_details",
+      render: (shipping_details, record) => {
+        // if (record?.email)
+          return <p>{shipping_details?.name}</p>;
+        // else return <p>{record?.session?.shipping_details?.name}</p>;
       },
     },
     // {
@@ -174,15 +174,15 @@ const Orders = () => {
       dataIndex: "shipping_details",
       key: "shipping_details",
       render: (shipping_details, record) => {
-        let locAddress = record?.session?.shipping_details?.address
-        if (record?.email)
-          return (
-            <p>{`${shipping_details?.address_line_1}, ${shipping_details?.address_line_1}, ${shipping_details?.city}, ${shipping_details?.country}, ${shipping_details?.zip_code}`}</p>
-          )
-        else
-          return (
-            <p>{`${locAddress?.line1}, ${locAddress?.line2}, ${locAddress?.city}, ${locAddress?.state}, ${locAddress?.country}, ${locAddress?.postal_code}`}</p>
-          )
+        return (
+          <p>{`${shipping_details?.address_line_1}, ${shipping_details?.address_line_2}, ${shipping_details?.city}, ${shipping_details?.country}, ${shipping_details?.zip_code}`}</p>
+        );
+        // let locAddress = record?.session?.shipping_details?.address
+        // if (record?.email)
+        // else
+        //   return (
+        //     <p>{`${locAddress?.line1}, ${locAddress?.line2}, ${locAddress?.city}, ${locAddress?.state}, ${locAddress?.country}, ${locAddress?.postal_code}`}</p>
+        //   )
       },
     },
     {
@@ -212,8 +212,8 @@ const Orders = () => {
               width: 120,
             }}
             onChange={(value) => {
-              console.log(value, record)
-              handleUpdateOrder(value, record)
+              console.log(value, record);
+              handleUpdateOrder(value, record);
             }}
             options={[
               {
@@ -233,62 +233,12 @@ const Orders = () => {
         </div>
       ),
     },
-    // {
-    //   title: 'Brand',
-    //   dataIndex: 'brand',
-    //   key: 'brand',
-    //   render: (brandId) => (
-    //     <div style={colStyle} className="scroll">
-    //       <Tag className="rounded-pill my-1" color="cyan">
-    //         {brands?.find((brand) => brand.id === brandId)?.name}
-    //       </Tag>
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   title: 'Price (£)',
-    //   dataIndex: 'price',
-    //   key: 'price',
-    //   render: (price, item) => {
-    //     if (item.discount === '' || !item.discount || item.discount === '0') {
-    //       return item.price
-    //     } else {
-    //       return (
-    //         <span>
-    //           <del className="text-danger fst-italic me-2">
-    //             {item.originalPrice}
-    //           </del>
-    //           <Tooltip title="Discounted Price">
-    //             <Tag className="fw-bold rounded-pill" color="orange">
-    //               {item.price}
-    //             </Tag>
-    //           </Tooltip>
-    //         </span>
-    //       )
-    //     }
-    //   },
-    //   sorter: (a, b) => a.price - b.price,
-    // },
     {
       title: "Actions",
       dataIndex: "id",
       key: "id",
       render: (id, item) => (
         <div className="d-flex">
-          {/* <Tooltip title={`Edit`}>
-            <Button
-              onClick={() => {
-                console.log({ item })
-                setProductDetails({ ...item })
-                handleEdit(item)
-              }}
-              className="btnSecondary me-1"
-              type="primary"
-              // loading={btnUpload}
-            >
-              <i className="fa fa-edit"></i>
-            </Button>
-          </Tooltip> */}
           <Popconfirm
             title="Delete order?"
             description="Are you sure to delete this order?"
@@ -304,115 +254,115 @@ const Orders = () => {
         </div>
       ),
     },
-  ]
+  ];
 
   useEffect(() => {
-    getOrders()
-    getProducts()
-    getCategories() // redux
-    dispatch(fetchProducts())
-    getUsers()
-    getWishlist()
-    getColors()
-    getClothTypes()
-    getBrands()
-  }, [])
+    getOrders();
+    getProducts();
+    getCategories(); // redux
+    dispatch(fetchProducts());
+    getUsers();
+    getWishlist();
+    getColors();
+    getClothTypes();
+    getBrands();
+  }, []);
 
   const handleUpdateOrder = (orderStatus = "", orderData) => {
     try {
-      setisLoading(true)
+      setisLoading(true);
       firebase
         .firestore()
         .collection("orders")
         .doc(orderData.id)
         .set({ ...orderData, orderStatus }, { merge: true })
         .then(() => {
-          message.success("Order status updated")
-          getOrders()
-        })
+          message.success("Order status updated");
+          getOrders();
+        });
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
-      setisLoading(false)
+      setisLoading(false);
     }
-  }
+  };
 
   const getBrands = async () => {
-    let data = await getData("brands")
+    let data = await getData("brands");
     if (data) {
-      setBrands(data)
+      setBrands(data);
     }
-  }
+  };
 
   const getOrders = async () => {
     let response = await firebase
       .firestore()
       .collection("orders")
       .orderBy("orderDate", "desc")
-      .get()
+      .get();
     let data = response.docs.map((doc) => {
-      return { ...doc.data(), id: doc.id }
-    })
+      return { ...doc.data(), id: doc.id };
+    });
     if (data) {
-      console.log({ data })
-      setOrders(data)
+      console.log({ data });
+      setOrders(data);
     }
-  }
+  };
 
   const getColors = async () => {
-    let data = await getData("colors")
-    setColors(data)
-  }
+    let data = await getData("colors");
+    setColors(data);
+  };
 
   const getClothTypes = async () => {
-    let data = await getData("clothTypes")
-    setClothTypes(data)
-  }
+    let data = await getData("clothTypes");
+    setClothTypes(data);
+  };
 
   useEffect(() => {
-    setCateg(categoriesRedux.categories)
-  }, [categoriesRedux])
+    setCateg(categoriesRedux.categories);
+  }, [categoriesRedux]);
 
   useEffect(() => {
-    setOccasions(occasionsRedux.occasions)
-  }, [occasionsRedux])
+    setOccasions(occasionsRedux.occasions);
+  }, [occasionsRedux]);
 
   useEffect(() => {
-    setInterests(interestsRedux.interests)
-  }, [interestsRedux])
+    setInterests(interestsRedux.interests);
+  }, [interestsRedux]);
   useEffect(() => {
     const count = productsRedux?.products?.filter((obj) => {
       if (obj?.stats?.featured === true) {
-        return true
+        return true;
       }
 
-      return false
-    }).length
-    setfeaturedCount(() => count)
-    dispatch(fetchProducts())
-  }, [featuredCount])
+      return false;
+    }).length;
+    setfeaturedCount(() => count);
+    dispatch(fetchProducts());
+  }, [featuredCount]);
   useEffect(() => {
-    setRecipients(recipientsRedux.recipients)
-  }, [recipientsRedux])
+    setRecipients(recipientsRedux.recipients);
+  }, [recipientsRedux]);
 
   useEffect(() => {
-    setAllProducts(productsRedux.products)
-    setSearch(productsRedux.products)
-  }, [productsRedux])
+    setAllProducts(productsRedux.products);
+    setSearch(productsRedux.products);
+  }, [productsRedux]);
 
   //  products
   const getProducts = async () => {
     if (productsRedux.isLoading) {
-      dispatch(fetchProducts())
+      dispatch(fetchProducts());
     }
-  }
+  };
 
   // categories
   const getCategories = async () => {
     if (categoriesRedux.isLoading === true) {
-      dispatch(fetchCategories())
+      dispatch(fetchCategories());
     }
-  }
+  };
 
   // occasions
   // const getOccasions = async () => {
@@ -437,18 +387,18 @@ const Orders = () => {
 
   // search in products
   const handleSearch = (value) => {
-    value = value.trim().toLowerCase()
-    var arr = cloneDeep(allProducts)
-    arr = arr?.filter((item) => item.name.toLowerCase().includes(value))
+    value = value.trim().toLowerCase();
+    var arr = cloneDeep(allProducts);
+    arr = arr?.filter((item) => item.name.toLowerCase().includes(value));
     for (var i = 0; i < arr.length; i++) {
       categ.forEach((item) => {
         if (item.id === arr[i].category) {
-          arr[i].category = item
+          arr[i].category = item;
         }
-      })
+      });
     }
-    setSearch(arr)
-  }
+    setSearch(arr);
+  };
 
   // const handleChangeFileName = (fileName, idx) => {
   //   let obj = cloneDeep(beforeUpload)
@@ -475,67 +425,67 @@ const Orders = () => {
   // add product in modal
   const handleAddOrder = async (values) => {
     if (discount) {
-      values.is_discounted = true
+      values.is_discounted = true;
     } else {
-      values.is_discounted = false
+      values.is_discounted = false;
     }
-    values.discount = discount
-    values.originalPrice = originalPrice
-    values.price = discountedPrice === 0 ? values.price : discountedPrice
-    values.discountType = discountType
-    values.createdDate = new Date()
-    values["is-new-product"] = true
-    setBtnUpload(true)
-    const url = await multiImageUpload("products", values.image.fileList)
-    values.image = url
-    values.admin = user // id of admin that posted the product
-    console.log(values)
-    let response = await addDoc("orders", values)
-    setBtnUpload(false)
+    values.discount = discount;
+    values.originalPrice = originalPrice;
+    values.price = discountedPrice === 0 ? values.price : discountedPrice;
+    values.discountType = discountType;
+    values.createdDate = new Date();
+    values["is-new-product"] = true;
+    setBtnUpload(true);
+    const url = await multiImageUpload("products", values.image.fileList);
+    values.image = url;
+    values.admin = user; // id of admin that posted the product
+    console.log(values);
+    let response = await addDoc("orders", values);
+    setBtnUpload(false);
     if (response === true) {
-      message.success("Product Created Successfully!")
-      handleModalClose()
-      getProducts()
-      dispatch(fetchProducts())
+      message.success("Product Created Successfully!");
+      handleModalClose();
+      getProducts();
+      dispatch(fetchProducts());
     }
-  }
+  };
 
   // modal close
   const handleModalClose = () => {
-    setShow(false)
-    form.resetFields()
-    setBtnUpload(false)
-    setDiscount("")
-    setDiscountedPrice(0)
-    setOriginalPrice(null)
-    setBeforeUpload(null)
-  }
+    setShow(false);
+    form.resetFields();
+    setBtnUpload(false);
+    setDiscount("");
+    setDiscountedPrice(0);
+    setOriginalPrice(null);
+    setBeforeUpload(null);
+  };
   // dummy request
   const dummyRequest = ({ file, onSuccess }) => {
     setTimeout(() => {
-      onSuccess("ok")
-    }, 0)
-  }
+      onSuccess("ok");
+    }, 0);
+  };
   // delete product
   const handleDelete = async (id) => {
-    let order = orders?.find((item) => item.id === id)
+    let order = orders?.find((item) => item.id === id);
     // setBtnUpload(true)
-    setisLoading(true)
+    setisLoading(true);
     await firebase
       .firestore()
       .collection("orders")
       .doc(id)
       .delete()
       .then(() => {
-        message.success("Order Deleted!")
-        getOrders()
-        setisLoading(false)
+        message.success("Order Deleted!");
+        getOrders();
+        setisLoading(false);
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
       })
-      .finally(() => setisLoading(false))
-  }
+      .finally(() => setisLoading(false));
+  };
 
   const getUsers = async () => {
     // dispatch(fetchUsers());
@@ -545,22 +495,22 @@ const Orders = () => {
         .collection("users")
         .get()
         .then((docs) => {
-          let arr = []
+          let arr = [];
           docs.forEach((doc) => {
             let obj = {
               id: doc.id,
               ...doc.data(),
-            }
-            arr.push(obj)
-          })
-          setAllUsers(arr)
+            };
+            arr.push(obj);
+          });
+          setAllUsers(arr);
           // setSearch(arr);
-        })
+        });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
   // edit modal form
   const getWishlist = async () => {
     try {
@@ -569,39 +519,39 @@ const Orders = () => {
         .collection("wishlists")
         .get()
         .then((docs) => {
-          let arr = []
+          let arr = [];
           docs.forEach((doc) => {
             let obj = {
               id: doc.id,
               ...doc.data(),
-            }
-            arr.push(obj)
-          })
-          setAllWishlist(arr)
+            };
+            arr.push(obj);
+          });
+          setAllWishlist(arr);
           // setSearch(arr);
-        })
+        });
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
   const sendProductsNotifictaion = (values) => {
     // edit
 
-    const temp = []
-    const temp1 = []
+    const temp = [];
+    const temp1 = [];
     for (const wislist of allWishlist) {
-      const wishlistid = wislist?.products?.filter((x) => x.id === edit.id)
-      if (wishlistid?.length > 0) temp.push(wislist.userId)
+      const wishlistid = wislist?.products?.filter((x) => x.id === edit.id);
+      if (wishlistid?.length > 0) temp.push(wislist.userId);
     }
     // getUsersByid(temp)
     const newuser = allUsers.filter((object1) => {
       return temp.some((object2) => {
-        return object1.id === object2
-      })
-    })
+        return object1.id === object2;
+      });
+    });
     // const filterUser = allUsers.id.filter(temp)
-    console.log(newuser, "email")
+    console.log(newuser, "email");
     newuser.map((user) => {
       const notification = {
         id: user.id,
@@ -612,43 +562,43 @@ const Orders = () => {
           },
         ],
         clicked: true,
-      }
+      };
 
-      saveData("notification", user.id, notification)
+      saveData("notification", user.id, notification);
       sendMailFunc({
         targetAdress: user,
       })
         .then((res) => {
-          console.log(res, "Email Sent! res")
+          console.log(res, "Email Sent! res");
         })
         .catch((err) => {
-          console.log(err, "Email Sent err!")
-        })
+          console.log(err, "Email Sent err!");
+        });
 
-      console.log("Email Sent!")
-    })
-  }
+      console.log("Email Sent!");
+    });
+  };
   const handleEditOrder = async (values) => {
-    values.discountType = discountType
+    values.discountType = discountType;
     // console.log(values.image);
-    setBtnUpload(true)
+    setBtnUpload(true);
     // return;
     if (values.image.fileList) {
-      console.log(values.image)
-      const url = await multiImageUpload("products", values.image.fileList)
-      values.image = [...url, ...edit.image]
+      console.log(values.image);
+      const url = await multiImageUpload("products", values.image.fileList);
+      values.image = [...url, ...edit.image];
     } else {
-      values.image = [...edit.image]
+      values.image = [...edit.image];
     }
-    console.log("values on eidt product", values.price, edit.price)
+    console.log("values on eidt product", values.price, edit.price);
     if (values.price !== edit.price) {
-      sendProductsNotifictaion(values)
+      sendProductsNotifictaion(values);
     }
 
-    values.discount = discount
-    values.originalPrice = originalPrice
-    values.price = discountedPrice === 0 ? values.price : discountedPrice
-    values.customLink = text
+    values.discount = discount;
+    values.originalPrice = originalPrice;
+    values.price = discountedPrice === 0 ? values.price : discountedPrice;
+    values.customLink = text;
 
     await firebase
       .firestore()
@@ -656,13 +606,13 @@ const Orders = () => {
       .doc(edit.id)
       .set(values, { merge: true })
       .then(() => {
-        message.success(edit.name + " updated")
-        handleBack()
-        getProducts()
-        dispatch(fetchProducts())
-      })
-    setBtnUpload(false)
-  }
+        message.success(edit.name + " updated");
+        handleBack();
+        getProducts();
+        dispatch(fetchProducts());
+      });
+    setBtnUpload(false);
+  };
 
   const handleEdit = (item) => {
     // Object.entries(item)?.map(([key, value]) => {
@@ -711,99 +661,99 @@ const Orders = () => {
     //     [key]: value,
     //   })
     // })
-    editForm.setFieldsValue({ ...item })
-    setDiscountType(item.discountType)
-    setDiscount(item.discount ?? "")
-    setOriginalPrice(item?.originalPrice ?? item.price)
-    setDiscountedPrice(item.price)
-    setEdit(item)
-    setKey("2")
-  }
+    editForm.setFieldsValue({ ...item });
+    setDiscountType(item.discountType);
+    setDiscount(item.discount ?? "");
+    setOriginalPrice(item?.originalPrice ?? item.price);
+    setDiscountedPrice(item.price);
+    setEdit(item);
+    setKey("2");
+  };
   const handleBack = () => {
-    setEdit(null)
-    setKey("1")
-    editForm.resetFields()
-    setBtnUpload(false)
-    setDiscount("")
-    setDiscountedPrice(0)
-    setOriginalPrice(null)
-  }
+    setEdit(null);
+    setKey("1");
+    editForm.resetFields();
+    setBtnUpload(false);
+    setDiscount("");
+    setDiscountedPrice(0);
+    setOriginalPrice(null);
+  };
 
   // handle discount
   const handleDiscount = (value) => {
-    setDiscount(value)
+    setDiscount(value);
     if (!originalPrice || originalPrice === "") {
       message.warn({
         content: "Please add Price first!",
         key: "price_add_first",
-      })
-      setDiscount("")
-      return
+      });
+      setDiscount("");
+      return;
     }
-    let price
-    let disPrice
+    let price;
+    let disPrice;
     if (discountType === "£") {
-      disPrice = originalPrice - value
+      disPrice = originalPrice - value;
     }
     if (discountType === "%") {
-      price = (originalPrice / 100) * value
-      disPrice = originalPrice - price
+      price = (originalPrice / 100) * value;
+      disPrice = originalPrice - price;
     }
-    disPrice = disPrice.toFixed(2)
-    setDiscountedPrice(disPrice)
-  }
+    disPrice = disPrice.toFixed(2);
+    setDiscountedPrice(disPrice);
+  };
   function containsWhitespace(str) {
-    return /\s/.test(str)
+    return /\s/.test(str);
   }
 
   // add category
   const handleAddCategory = async () => {
-    setBtnUpload(true)
-    const status = await dispatch(addCategory(catSearch))
+    setBtnUpload(true);
+    const status = await dispatch(addCategory(catSearch));
     if (status === 200) {
-      setCatSearch("")
+      setCatSearch("");
     }
-    setBtnUpload(false)
-  }
+    setBtnUpload(false);
+  };
   // add interest
   const handleAddInterest = async () => {
-    setBtnUpload(true)
-    const status = await dispatch(addInterest(interSearch))
+    setBtnUpload(true);
+    const status = await dispatch(addInterest(interSearch));
     if (status === 200) {
-      setInterSearch("")
+      setInterSearch("");
     }
-    setBtnUpload(false)
-  }
+    setBtnUpload(false);
+  };
 
   // add occasion
   const handleAddColor = async () => {
-    setBtnUpload(true)
+    setBtnUpload(true);
     let doc = {
       name: colorSearch,
       label: colorSearch.slice(0, 1).toUpperCase(),
-    }
-    const response = await addDoc("colors", doc)
+    };
+    const response = await addDoc("colors", doc);
     if (response === true) {
-      getColors()
+      getColors();
     }
-    setColorSearch("")
-    setBtnUpload(false)
-  }
+    setColorSearch("");
+    setBtnUpload(false);
+  };
 
   // Add Cloth Type
   const handleAddClothType = async () => {
-    setBtnUpload(true)
+    setBtnUpload(true);
     let doc = {
       name: clothTypeSearch,
       label: clothTypeSearch.slice(0, 1).toUpperCase(),
-    }
-    const response = await addDoc("clothTypes", doc)
+    };
+    const response = await addDoc("clothTypes", doc);
     if (response === true) {
-      getClothTypes()
+      getClothTypes();
     }
-    setClothTypeSearch("")
-    setBtnUpload(false)
-  }
+    setClothTypeSearch("");
+    setBtnUpload(false);
+  };
 
   return (
     <>
@@ -982,8 +932,8 @@ const Orders = () => {
                                 <div>
                                   <Radio.Group
                                     onChange={(e) => {
-                                      setDiscountType(e.target.value)
-                                      handleDiscount(discount)
+                                      setDiscountType(e.target.value);
+                                      handleDiscount(discount);
                                     }}
                                     value={discountType}
                                   >
@@ -1069,7 +1019,7 @@ const Orders = () => {
                               categ?.map((item) => {
                                 return (
                                   <Option value={item.id}>{item.name}</Option>
-                                )
+                                );
                               })}
                           </Select>
                         </Item>
@@ -1120,7 +1070,7 @@ const Orders = () => {
                               colors?.map((item) => {
                                 return (
                                   <Option value={item.id}>{item.name}</Option>
-                                )
+                                );
                               })}
                           </Select>
                         </Item>
@@ -1188,7 +1138,7 @@ const Orders = () => {
                               clothTypes?.map((item) => {
                                 return (
                                   <Option value={item.id}>{item.name}</Option>
-                                )
+                                );
                               })}
                           </Select>
                         </Item>
@@ -1215,7 +1165,7 @@ const Orders = () => {
                               brands?.map((item) => {
                                 return (
                                   <Option value={item.id}>{item.name}</Option>
-                                )
+                                );
                               })}
                           </Select>
                         </Item>
@@ -1285,7 +1235,7 @@ const Orders = () => {
                             accept="image/*"
                             customRequest={dummyRequest}
                             onRemove={() => {
-                              setFileName("")
+                              setFileName("");
                             }}
                             listType="picture"
                             multiple
@@ -1311,12 +1261,12 @@ const Orders = () => {
                                     className="fas fa-trash fs-5"
                                     style={{ cursor: "pointer" }}
                                     onClick={(e) => {
-                                      let arr = [...productDetails?.image]
-                                      arr?.splice(index, 1)
+                                      let arr = [...productDetails?.image];
+                                      arr?.splice(index, 1);
                                       setEdit((prev) => ({
                                         ...prev,
                                         image: [...arr],
-                                      }))
+                                      }));
                                     }}
                                   ></i>
                                   <Avatar
@@ -1417,8 +1367,8 @@ const Orders = () => {
                           <div>
                             <Radio.Group
                               onChange={(e) => {
-                                setDiscountType(e.target.value)
-                                handleDiscount(discount)
+                                setDiscountType(e.target.value);
+                                handleDiscount(discount);
                               }}
                               value={discountType}
                             >
@@ -1493,7 +1443,7 @@ const Orders = () => {
                     >
                       {categ &&
                         categ?.map((item) => {
-                          return <Option value={item.id}>{item.name}</Option>
+                          return <Option value={item.id}>{item.name}</Option>;
                         })}
                     </Select>
                   </Item>
@@ -1542,7 +1492,7 @@ const Orders = () => {
                     >
                       {colors &&
                         colors?.map((item) => {
-                          return <Option value={item.id}>{item.name}</Option>
+                          return <Option value={item.id}>{item.name}</Option>;
                         })}
                     </Select>
                   </Item>
@@ -1602,7 +1552,7 @@ const Orders = () => {
                     >
                       {clothTypes &&
                         clothTypes?.map((item) => {
-                          return <Option value={item.id}>{item.name}</Option>
+                          return <Option value={item.id}>{item.name}</Option>;
                         })}
                     </Select>
                   </Item>
@@ -1627,7 +1577,7 @@ const Orders = () => {
                     >
                       {brands &&
                         brands?.map((item) => {
-                          return <Option value={item.id}>{item.name}</Option>
+                          return <Option value={item.id}>{item.name}</Option>;
                         })}
                     </Select>
                   </Item>
@@ -1694,7 +1644,7 @@ const Orders = () => {
                       accept="image/*"
                       customRequest={dummyRequest}
                       onRemove={() => {
-                        setFileName("")
+                        setFileName("");
                       }}
                       listType="picture"
                       multiple
@@ -1721,7 +1671,7 @@ const Orders = () => {
         </Container>
       </Spin>
     </>
-  )
-}
+  );
+};
 
-export default Orders
+export default Orders;
