@@ -401,7 +401,7 @@ const Products = () => {
     } else {
       values["is_discounted"] = true
     }
-    let response = await addDoc("products", values)
+    let response = await addDocWithId("products", values)
     setBtnUpload(false)
     if (response === true) {
       message.success("Product Created Successfully!")
@@ -410,7 +410,17 @@ const Products = () => {
       dispatch(fetchProducts())
     }
   }
-
+  const addDocWithId = async (collection, values) => {
+    try {
+      const docRef = await firebase.firestore().collection(collection).add(values);
+      // After adding document, update it with its own ID
+      await docRef.update({ uid: docRef.id });
+      return true;
+    } catch (error) {
+      console.error("Error adding document:", error);
+      return false;
+    }
+  };
   // modal close
   const handleModalClose = () => {
     setShow(false)
