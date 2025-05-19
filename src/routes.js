@@ -32,6 +32,7 @@ import ClothTypes from './Pages/ClothTypes'
 import SizeChart from './Pages/SizeChart'
 import Orders from './Pages/Orders'
 import SpecialOffer from './Pages/SpecialOffer'
+import ReviewsManagement from './Pages/ReviewsManagement'
 
 export const routes = [
   // {
@@ -122,6 +123,15 @@ export const routes = [
     layout: 'admin',
     sidebar: true,
   },
+  {
+    path: '/reviews',
+    name: 'Reviews',
+    icon: () => <BarsOutlined />,
+    component: ReviewsManagement,
+    layout: 'admin',
+    sidebar: true,
+  },
+  
   // {
   //   path: '/occasions',
   //   name: 'Occasions',

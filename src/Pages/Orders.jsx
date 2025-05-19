@@ -176,6 +176,8 @@ const Orders = () => {
           <Option value="pending">Pending</Option>
           <Option value="shipped">Shipped</Option>
           <Option value="completed">Completed</Option>
+          <Option value="Ready To Ship">Ready To Ship</Option>
+
         </Select>
       )
     },
